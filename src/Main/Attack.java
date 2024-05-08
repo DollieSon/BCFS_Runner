@@ -9,11 +9,14 @@ public abstract class Attack {
     private double damageScaler;
     private int CurrSpeed;
 
+    private Entity Owner;
+
     public Attack(String name, int speed, int damage,double damageScaler) {
         Name = name;
         Speed = speed;
         Damage = damage;
         this.damageScaler = damageScaler;
+        CurrSpeed = Speed;
     }
 
     public Attack resetCurrSpeed(){
@@ -73,5 +76,24 @@ public abstract class Attack {
 
     public double getDamageScaler() {
         return damageScaler;
+    }
+
+    public String toString(){
+        return String.format("%s\t%s\t%s\t%s",Name,Damage,Speed,CurrSpeed);
+    }
+
+    public Attack setDamageScaler(double damageScaler) {
+        this.damageScaler = damageScaler;
+        return this;
+    }
+
+    public Entity getOwner() {
+        return Owner;
+    }
+
+    public Attack setOwner(Entity owner) {
+        if(owner!= null) throw new ClassCastException("Attack Already Has an Owner");
+        Owner = owner;
+        return this;
     }
 }

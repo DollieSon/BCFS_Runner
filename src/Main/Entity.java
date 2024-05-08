@@ -78,6 +78,7 @@ public class Entity {
             throw new ArrayIndexOutOfBoundsException("AttackList is Full");
         }
         AttackList.add(newAttack);
+        newAttack.setOwner(this);
         return this;
     }
 
@@ -97,6 +98,13 @@ public class Entity {
         for(Attack attack: AttackList){
             AttackString.append("\t\t" + attack.toString() + "\n");
         }
-        return String.format("Name: %s \n\tHP: %d/%d \n",Name,getStat(StatName.Health,StatType.Current),getStat(StatName.Health,StatType.Base) + getStat(StatName.Health,StatType.Bonus)) + AttackString;
+        return String.format("Name: %s \n\tHP: %d/%d \n\tDamage: %d\t%d\t%d\n\tSpeed: %d\t%d\t%d\n",
+                Name,getStat(StatName.Health,StatType.Current),getStat(StatName.Health,StatType.Base) + getStat(StatName.Health,StatType.Bonus),
+                //Damage
+                Damage[StatType.Base.ordinal()],Damage[StatType.Bonus.ordinal()],Damage[StatType.Current.ordinal()],
+                //Speed
+                Speed[StatType.Base.ordinal()],Speed[StatType.Bonus.ordinal()],Speed[StatType.Current.ordinal()]
+        )
+                + AttackString;
     }
 }
