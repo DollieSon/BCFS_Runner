@@ -6,12 +6,14 @@ public abstract class Attack {
     private String Name;
     private int Speed;
     private int Damage;
-    private int damageScaler;
+    private double damageScaler;
+    private int CurrSpeed;
 
-    public Attack(String name, int speed, int damage,int damageScaler) {
+    public Attack(String name, int speed, int damage,double damageScaler) {
         Name = name;
         Speed = speed;
         Damage = damage;
+        this.damageScaler = damageScaler;
     }
 
     public Attack resetCurrSpeed(){
@@ -42,7 +44,6 @@ public abstract class Attack {
         return this;
     }
 
-    private int CurrSpeed;
     public abstract void apply(Entity Owner, Entity Target);
 
     public String getName() {
@@ -70,7 +71,7 @@ public abstract class Attack {
         }
     }
 
-    public int getDamageScaler() {
+    public double getDamageScaler() {
         return damageScaler;
     }
 }
