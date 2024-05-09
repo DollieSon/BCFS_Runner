@@ -90,6 +90,9 @@ public class Entity {
         for(int[] specStat : AllStats){
             specStat[StatType.Current.ordinal()] =  specStat[StatType.Base.ordinal()] +  specStat[StatType.Bonus.ordinal()];
         }
+        for(Attack atk: AttackList){
+            atk.resetCurrSpeed();
+        }
         return this;
     }
     @Override

@@ -6,13 +6,9 @@ import java.util.Collections;
 public class Helpers {
     public static void Fight(Entity Player,Entity Enemy){
         //reset Player Health
-        Player.setStat(Entity.StatName.Health, Entity.StatType.Current,
-                        Player.getStat(Entity.StatName.Health, Entity.StatType.Base)
-                );
+        Player.resetCurrent();
         //reset Enemy Health
-        Enemy.setStat(Entity.StatName.Health, Entity.StatType.Current,
-                Enemy.getStat(Entity.StatName.Health, Entity.StatType.Base)
-        );
+        Player.resetCurrent();
         while(true){
             if(Player.getStat(Entity.StatName.Health, Entity.StatType.Current) <= 0){
                 System.out.println("Player Died");

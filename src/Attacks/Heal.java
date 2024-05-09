@@ -12,8 +12,8 @@ public class Heal extends Attack {
     @Override
     public void apply(Entity Owner, Entity Target) {
         int damage =this.getDamage() + (int) (Owner.getStat(Entity.StatName.Damage, Entity.StatType.Current) * this.getDamageScaler());
-        int newHealth = Target.getStat(Entity.StatName.Health, Entity.StatType.Current) + damage;
-        Target.setStat(Entity.StatName.Health, Entity.StatType.Current,newHealth);
+        int newHealth = Owner.getStat(Entity.StatName.Health, Entity.StatType.Current) + damage;
+        Owner.setStat(Entity.StatName.Health, Entity.StatType.Current,newHealth);
         this.incrementCurrSpeed();
     }
 }

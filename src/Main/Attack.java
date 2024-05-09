@@ -43,7 +43,7 @@ public abstract class Attack {
     }
 
     public Attack incrementCurrSpeed(){
-        CurrSpeed+= Speed;
+        setCurrSpeed(getCurrSpeed()+getSpeed());
         return this;
     }
 
@@ -79,7 +79,7 @@ public abstract class Attack {
     }
 
     public String toString(){
-        return String.format("%s\t%s\t%s\t%s",Name,Damage,Speed,CurrSpeed);
+        return String.format("%s\t%s\t%s\t%s",getName(),getDamage(),getSpeed(),getCurrSpeed());
     }
 
     public Attack setDamageScaler(double damageScaler) {
