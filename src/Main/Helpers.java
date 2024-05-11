@@ -8,15 +8,17 @@ public class Helpers {
         //reset Player Health
         Player.resetCurrent();
         //reset Enemy Health
-        Player.resetCurrent();
+        Enemy.resetCurrent();
+        System.out.println(Player.toString());
+        System.out.println(Enemy.toString());
         while(true){
             if(Player.getStat(Entity.StatName.Health, Entity.StatType.Current) <= 0){
                 System.out.println("Player Died");
-                return;
+                break;
             }
             if(Enemy.getStat(Entity.StatName.Health, Entity.StatType.Current) <= 0){
                 System.out.println("Enemy Died");
-                return;
+                break;
             }
             Attack PlayerAttack = Player.getAttack();
             Attack EnemyAttack = Enemy.getAttack();
@@ -29,8 +31,8 @@ public class Helpers {
                 System.out.println(Enemy.getName() + "Attacks with " + EnemyAttack.getName());
                 EnemyAttack.apply(Enemy,Player);
             }
-            System.out.println(Player.toString());
-            System.out.println(Enemy.toString());
         }
+        System.out.println(Player.toString());
+        System.out.println(Enemy.toString());
     }
 }
