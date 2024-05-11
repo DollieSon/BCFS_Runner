@@ -6,7 +6,7 @@ import java.util.Collections;
 public class Entity {
     public static int MAX_ATTACKS = 3;
     private String name;
-    private ArrayList<Attack> attacklist;
+    private ArrayList<Attack> attackList;
     private int[] health;
     private int[] speed;
     private int[] damage;
@@ -22,13 +22,13 @@ public class Entity {
         CURRENT,
     }
 
-    public Entity(String Name, int Health, int Speed, int Damage){
-        this.name = Name;
+    public Entity(String name, int health, int speed, int damage){
+        this.name = name;
         //Base,Bonus,Curr
-        this.health = new int[]{Health, 0, Health};
-        this.speed = new int[]{Speed, 0, Speed};
-        this.damage = new int[]{Damage, 0, Damage};
-        this.attacklist = new ArrayList<>();
+        this.health = new int[]{health, 0, health};
+        this.speed = new int[]{speed, 0, speed};
+        this.damage = new int[]{damage, 0, damage};
+        this.attackList = new ArrayList<>();
     }
 
     public int getStat(StatName statName, StatType statType){
@@ -92,14 +92,14 @@ public class Entity {
         return this;
     }
     public Attack getAttack(){
-        Collections.sort(attacklist,new Attack.sortBySpeed());
-        return attacklist.get(0);
+        Collections.sort(attackList,new Attack.sortBySpeed());
+        return attackList.get(0);
     }
     public Entity addAttack(Attack newAttack) throws ArrayIndexOutOfBoundsException{
-        if(attacklist.size() > MAX_ATTACKS){
+        if(attackList.size() > MAX_ATTACKS){
             throw new ArrayIndexOutOfBoundsException("AttackList is Full");
         }
-        attacklist.add(newAttack);
+        attackList.add(newAttack);
         newAttack.setOwner(this);
         return this;
     }
@@ -113,7 +113,7 @@ public class Entity {
             specStat[StatType.BONUS.ordinal()] = 0;
             specStat[StatType.CURRENT.ordinal()] =  specStat[StatType.BASE.ordinal()] +  specStat[StatType.BONUS.ordinal()];
         }
-        for(Attack atk: attacklist){
+        for(Attack atk: attackList){
             atk.resetCurrSpeed();
         }
         return this;
@@ -121,7 +121,7 @@ public class Entity {
     @Override
     public String toString(){
         StringBuilder AttackString = new StringBuilder();
-        for(Attack attack: attacklist){
+        for(Attack attack: attackList){
             AttackString.append("\t\t" + attack.toString() + "\n");
         }
         return String.format("Name: %s \n\tHP: %d/%d \n\tDamage: %d\t%d\t%d\n\tSpeed: %d\t%d\t%d\n",

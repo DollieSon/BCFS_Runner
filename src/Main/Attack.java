@@ -8,18 +8,17 @@ public class Attack {
     private String name;
     private int speed;
     private int damage;
-    private double damageScaler;
+    private double damageMultiplier;
     private int currSpeed;
 
     private Entity owner;
-
     private AttackModule attackModule;
 
-    public Attack(String name, int speed, int damage,double damageScaler, AttackModule attackModule) {
+    public Attack(String name, int speed, int damage,double damageMultiplier, AttackModule attackModule) {
         this.name = name;
         this.speed = speed;
         this.damage = damage;
-        this.damageScaler = damageScaler;
+        this.damageMultiplier = damageMultiplier;
         currSpeed = this.speed;
         this.attackModule = attackModule;
     }
@@ -82,16 +81,16 @@ public class Attack {
         }
     }
 
-    public double getDamageScaler() {
-        return damageScaler;
+    public double getDamageMultiplier() {
+        return damageMultiplier;
     }
 
     public String toString(){
         return String.format("%s\t%s\t%s\t%s", getName(), getDamage(), getSpeed(), getCurrSpeed());
     }
 
-    public Attack setDamageScaler(double damageScaler) {
-        this.damageScaler = damageScaler;
+    public Attack setDamageMultiplier(double damageMultiplier) {
+        this.damageMultiplier = damageMultiplier;
         return this;
     }
 

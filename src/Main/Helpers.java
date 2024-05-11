@@ -17,9 +17,9 @@ public class Helpers {
             }
             Attack PlayerAttack = player.getAttack();
             Attack EnemyAttack = enemy.getAttack();
-            int PAttackSpeed = PlayerAttack.getCurrSpeed() + player.getStat(Entity.StatName.SPEED, Entity.StatType.CURRENT);
-            int EAttackSpeed = EnemyAttack.getCurrSpeed() + enemy.getStat(Entity.StatName.SPEED, Entity.StatType.CURRENT);
-            if(PAttackSpeed <= EAttackSpeed){
+            int player_attackSpeed = PlayerAttack.getCurrSpeed() + player.getStat(Entity.StatName.SPEED, Entity.StatType.CURRENT);
+            int entity_attackSpeed = EnemyAttack.getCurrSpeed() + enemy.getStat(Entity.StatName.SPEED, Entity.StatType.CURRENT);
+            if(player_attackSpeed <= entity_attackSpeed){
                 System.out.println(player.getName() + "Attacks with " + PlayerAttack.getName());
                 PlayerAttack.apply(player,enemy);
             }else{
