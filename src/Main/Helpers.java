@@ -1,38 +1,33 @@
 package Main;
 
-import java.sql.SQLOutput;
-import java.util.Collections;
-
 public class Helpers {
-    public static void Fight(Entity Player,Entity Enemy){
+    public static void Fight(Entity player, Entity enemy){
         //reset Player Health
-        Player.resetCurrent();
+        player.resetCurrent();
         //reset Enemy Health
-        Enemy.resetCurrent();
-        System.out.println(Player.toString());
-        System.out.println(Enemy.toString());
-        while(true){
-            if(Player.getStat(Entity.StatName.Health, Entity.StatType.Current) <= 0){
+        player.resetCurrent();
+        while(true) {
+            if(player.getStat(Entity.StatName.HEALTH, Entity.StatType.CURRENT) <= 0){
                 System.out.println("Player Died");
-                break;
+                return;
             }
-            if(Enemy.getStat(Entity.StatName.Health, Entity.StatType.Current) <= 0){
+            if(enemy.getStat(Entity.StatName.HEALTH, Entity.StatType.CURRENT) <= 0){
                 System.out.println("Enemy Died");
-                break;
+                return;
             }
-            Attack PlayerAttack = Player.getAttack();
-            Attack EnemyAttack = Enemy.getAttack();
-            int PAttackSpeed = PlayerAttack.getCurrSpeed() + Player.getStat(Entity.StatName.Speed, Entity.StatType.Current);
-            int EAttackSpeed = EnemyAttack.getCurrSpeed() + Enemy.getStat(Entity.StatName.Speed, Entity.StatType.Current);
+            Attack PlayerAttack = player.getAttack();
+            Attack EnemyAttack = enemy.getAttack();
+            int PAttackSpeed = PlayerAttack.getCurrSpeed() + player.getStat(Entity.StatName.SPEED, Entity.StatType.CURRENT);
+            int EAttackSpeed = EnemyAttack.getCurrSpeed() + enemy.getStat(Entity.StatName.SPEED, Entity.StatType.CURRENT);
             if(PAttackSpeed <= EAttackSpeed){
-                System.out.println(Player.getName() + "Attacks with " + PlayerAttack.getName());
-                PlayerAttack.apply(Player,Enemy);
+                System.out.println(player.getName() + "Attacks with " + PlayerAttack.getName());
+                PlayerAttack.apply(player,enemy);
             }else{
-                System.out.println(Enemy.getName() + "Attacks with " + EnemyAttack.getName());
-                EnemyAttack.apply(Enemy,Player);
+                System.out.println(enemy.getName() + "Attacks with " + EnemyAttack.getName());
+                EnemyAttack.apply(enemy,player);
             }
+            System.out.println(player.toString());
+            System.out.println(enemy.toString());
         }
-        System.out.println(Player.toString());
-        System.out.println(Enemy.toString());
     }
 }

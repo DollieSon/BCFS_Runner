@@ -5,80 +5,80 @@ import Attacks.AttackModule;
 import java.util.Comparator;
 
 public class Attack {
-    private String Name;
-    private int Speed;
-    private int Damage;
+    private String name;
+    private int speed;
+    private int damage;
     private double damageScaler;
-    private int CurrSpeed;
+    private int currSpeed;
 
-    private Entity Owner;
+    private Entity owner;
 
     private AttackModule attackModule;
 
     public Attack(String name, int speed, int damage,double damageScaler, AttackModule attackModule) {
-        Name = name;
-        Speed = speed;
-        Damage = damage;
+        this.name = name;
+        this.speed = speed;
+        this.damage = damage;
         this.damageScaler = damageScaler;
-        CurrSpeed = Speed;
+        currSpeed = this.speed;
         this.attackModule = attackModule;
     }
 
     public Attack resetCurrSpeed(){
-        CurrSpeed = 0;
+        currSpeed = 0;
         return this;
     }
 
     public int getDamage() {
-        return Damage;
+        return damage;
     }
 
     public Attack setDamage(int damage) {
-        Damage = damage;
+        this.damage = damage;
         return this;
     }
 
     public int getCurrSpeed() {
-        return CurrSpeed;
+        return currSpeed;
     }
 
     public Attack setCurrSpeed(int currSpeed) {
-        CurrSpeed = currSpeed;
+        this.currSpeed = currSpeed;
         return this;
     }
 
     public Attack incrementCurrSpeed(){
-        setCurrSpeed(getCurrSpeed()+getSpeed());
+        setCurrSpeed(getCurrSpeed() + getSpeed());
         return this;
     }
 
-    public void apply(Entity Owner, Entity Target){
-        attackModule.apply(Owner,Target,this);
+    public void apply(Entity owner, Entity target){
+        attackModule.apply(owner, target, this);
         this.incrementCurrSpeed();
     }
 
     public String getName() {
-        return Name;
+        return name;
     }
 
     public Attack setName(String name) {
-        Name = name;
+        this.name = name;
         return this;
     }
 
     public int getSpeed() {
-        return Speed;
+        return speed;
     }
 
     public Attack setSpeed(int speed) {
-        Speed = speed;
+        this.speed = speed;
         return this;
     }
 
     public static class sortBySpeed implements Comparator<Attack>{
         @Override
         public int compare(Attack o1, Attack o2) {
-            return Integer.compare(o1.getCurrSpeed(),o2.getCurrSpeed());
+            return Integer.compare(o1.getCurrSpeed(), o2.getCurrSpeed());
         }
     }
 
@@ -87,7 +87,7 @@ public class Attack {
     }
 
     public String toString(){
-        return String.format("%s\t%s\t%s\t%s",getName(),getDamage(),getSpeed(),getCurrSpeed());
+        return String.format("%s\t%s\t%s\t%s", getName(), getDamage(), getSpeed(), getCurrSpeed());
     }
 
     public Attack setDamageScaler(double damageScaler) {
@@ -96,12 +96,12 @@ public class Attack {
     }
 
     public Entity getOwner() {
-        return Owner;
+        return owner;
     }
 
     public Attack setOwner(Entity owner) {
-        if(Owner!= null) throw new ClassCastException("Attack Already Has an Owner");
-        Owner = owner;
+        if(this.owner != null) throw new ClassCastException("Attack Already Has an Owner");
+        this.owner = owner;
         return this;
     }
 }

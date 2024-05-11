@@ -4,116 +4,116 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class Entity {
-    public static int MAXATTACKS = 3;
-    private String Name;
-    private ArrayList<Attack> AttackList;
-    private int[] Health;
-    private int[] Speed;
-    private int[] Damage;
+    public static int MAX_ATTACKS = 3;
+    private String name;
+    private ArrayList<Attack> attacklist;
+    private int[] health;
+    private int[] speed;
+    private int[] damage;
 
-    public enum StatName{
-        Health,
-        Speed,
-        Damage
+    public enum StatName {
+        HEALTH,
+        SPEED,
+        DAMAGE
     }
-    public enum StatType{
-        Base,
-        Bonus,
-        Current,
+    public enum StatType {
+        BASE,
+        BONUS,
+        CURRENT,
     }
 
-    public Entity(String Name,int Health,int Speed,int Damage){
-        this.Name = Name;
+    public Entity(String Name, int Health, int Speed, int Damage){
+        this.name = Name;
         //Base,Bonus,Curr
-        this.Health = new int[]{Health,0,Health};
-        this.Speed = new int[]{Speed,0,Speed};
-        this.Damage = new int[]{Damage,0,Damage};
-        this.AttackList = new ArrayList<>();
+        this.health = new int[]{Health, 0, Health};
+        this.speed = new int[]{Speed, 0, Speed};
+        this.damage = new int[]{Damage, 0, Damage};
+        this.attacklist = new ArrayList<>();
     }
 
-    public int getStat(StatName Sn,StatType St){
+    public int getStat(StatName statName, StatType statType){
         int[] Stat;
-        switch (Sn){
-            case Health:
-                Stat = Health;
+        switch (statName){
+            case HEALTH:
+                Stat = health;
                 break;
-            case Speed:
-                Stat = Speed;
+            case SPEED:
+                Stat = speed;
                 break;
-            case Damage:
-                Stat = Damage;
+            case DAMAGE:
+                Stat = damage;
                 break;
             default:
                 //throw error
                 return 0;
         }
-        return Stat[St.ordinal()];
+        return Stat[statType.ordinal()];
     }
 
-    public Entity setStat(StatName Sn, StatType st, int number){
+    public Entity setStat(StatName statName, StatType statType, int number){
         int[] Stat;
-        switch (Sn){
-            case Health:
-                Stat = Health;
+        switch (statName) {
+            case HEALTH:
+                Stat = health;
                 break;
-            case Speed:
-                Stat = Speed;
+            case SPEED:
+                Stat = speed;
                 break;
-            case Damage:
-                Stat = Damage;
+            case DAMAGE:
+                Stat = damage;
                 break;
             default:
                 //throw error
                 return this;
         }
-        Stat[st.ordinal()] = number;
-        if(st == StatType.Bonus) Stat[StatType.Current.ordinal()] = Stat[StatType.Base.ordinal()] + Stat[StatType.Bonus.ordinal()];
+        Stat[statType.ordinal()] = number;
+        if (statType == StatType.BONUS) Stat[StatType.CURRENT.ordinal()] = Stat[StatType.BASE.ordinal()] + Stat[StatType.BONUS.ordinal()];
         return this;
     }
 
-    public Entity addStat(StatName Sn, StatType st, int number){
+    public Entity addStat(StatName statName, StatType statType, int number){
         int[] Stat;
-        switch (Sn){
-            case Health:
-                Stat = Health;
+        switch (statName){
+            case HEALTH:
+                Stat = health;
                 break;
-            case Speed:
-                Stat = Speed;
+            case SPEED:
+                Stat = speed;
                 break;
-            case Damage:
-                Stat = Damage;
+            case DAMAGE:
+                Stat = damage;
                 break;
             default:
                 //throw error
                 return this;
         }
-        Stat[st.ordinal()] += number;
-        if(st == StatType.Bonus) Stat[StatType.Current.ordinal()] = Stat[StatType.Base.ordinal()] + Stat[StatType.Bonus.ordinal()];
+        Stat[statType.ordinal()] += number;
+        if(statType == StatType.BONUS) Stat[StatType.CURRENT.ordinal()] = Stat[StatType.BASE.ordinal()] + Stat[StatType.BONUS.ordinal()];
         return this;
     }
     public Attack getAttack(){
-        Collections.sort(AttackList,new Attack.sortBySpeed());
-        return AttackList.get(0);
+        Collections.sort(attacklist,new Attack.sortBySpeed());
+        return attacklist.get(0);
     }
     public Entity addAttack(Attack newAttack) throws ArrayIndexOutOfBoundsException{
-        if(AttackList.size() > MAXATTACKS){
+        if(attacklist.size() > MAX_ATTACKS){
             throw new ArrayIndexOutOfBoundsException("AttackList is Full");
         }
-        AttackList.add(newAttack);
+        attacklist.add(newAttack);
         newAttack.setOwner(this);
         return this;
     }
 
     public String getName() {
-        return Name;
+        return name;
     }
     public Entity resetCurrent(){
-        int[][] AllStats = {Damage,Health,Speed};
+        int[][] AllStats = {damage, health, speed};
         for(int[] specStat : AllStats){
             specStat[StatType.Bonus.ordinal()] = 0;
-            specStat[StatType.Current.ordinal()] =  specStat[StatType.Base.ordinal()] +  specStat[StatType.Bonus.ordinal()];
+            specStat[StatType.CURRENT.ordinal()] =  specStat[StatType.BASE.ordinal()] +  specStat[StatType.BONUS.ordinal()];
         }
-        for(Attack atk: AttackList){
+        for(Attack atk: attacklist){
             atk.resetCurrSpeed();
         }
         return this;
@@ -121,15 +121,15 @@ public class Entity {
     @Override
     public String toString(){
         StringBuilder AttackString = new StringBuilder();
-        for(Attack attack: AttackList){
+        for(Attack attack: attacklist){
             AttackString.append("\t\t" + attack.toString() + "\n");
         }
         return String.format("Name: %s \n\tHP: %d/%d \n\tDamage: %d\t%d\t%d\n\tSpeed: %d\t%d\t%d\n",
-                Name,getStat(StatName.Health,StatType.Current),getStat(StatName.Health,StatType.Base),
+                name,getStat(StatName.HEALTH,StatType.CURRENT),getStat(StatName.HEALTH,StatType.BASE),
                 //Damage
-                Damage[StatType.Base.ordinal()],Damage[StatType.Bonus.ordinal()],Damage[StatType.Current.ordinal()],
+                damage[StatType.BASE.ordinal()], damage[StatType.BONUS.ordinal()], damage[StatType.CURRENT.ordinal()],
                 //Speed
-                Speed[StatType.Base.ordinal()],Speed[StatType.Bonus.ordinal()],Speed[StatType.Current.ordinal()]
+                speed[StatType.BASE.ordinal()], speed[StatType.BONUS.ordinal()], speed[StatType.CURRENT.ordinal()]
         )
                 + AttackString;
     }
