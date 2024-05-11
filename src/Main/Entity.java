@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class Entity {
-    public static int MAX_ATTACKS = 3;
+    public static int MAX_ATTACKS = 4;
     private String name;
     private ArrayList<Attack> attackList;
     private int[] health;
