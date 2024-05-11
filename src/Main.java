@@ -1,13 +1,14 @@
 import Attacks.Heal;
 import Attacks.Leech;
 import Attacks.SingleAttack;
+import DB.AttacksTable;
 import Main.*;
 
 import java.sql.Connection;
 
 public class Main {
     public static void main(String[] args) {
-
+        AttacksTable.getAllAttacks();
     }
 
     public void Test1(){

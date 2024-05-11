@@ -7,12 +7,14 @@ import java.sql.SQLException;
 public class MySQLConnection {
 
     public static final String URL =
-            "jdbc:mysql://192.168.1.13:3306/dbvillamorf1";
+            "jdbc:mysql://192.168.1.13:3306/bcfs";
     public static final String USERNAME = "client";
     public static final String PASSSWORD = "";
-    static Connection getConnection(){
 
-
+    private static Connection connection;
+    private MySQLConnection(){}
+    public static Connection getConnection(){
+        if(connection != null) return connection;
         Connection c = null;
         try{
             c= DriverManager.getConnection(URL, USERNAME,PASSSWORD);
@@ -20,12 +22,11 @@ public class MySQLConnection {
         }catch (SQLException e){
             e.printStackTrace();
         }
-        return c;
+        connection = c;
+        return connection;
     }
 
     public static void main(String[] args) {
-
-
         Connection c = getConnection();
         try{
             c.close();
