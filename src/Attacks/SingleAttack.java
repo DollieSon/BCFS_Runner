@@ -4,17 +4,10 @@ import Main.Attack;
 import Main.Entity;
 import Main.Helpers;
 
-public class SingleAttack extends Attack {
-    public SingleAttack(String name, int speed, int damage, double damageScaler) {
-        super(name, speed, damage, damageScaler);
-    }
-
+public class SingleAttack implements AttackModule{
     @Override
-    public void apply(Entity Owner, Entity Target) {
-        int damage =this.getDamage() + (int) (Owner.getStat(Entity.StatName.Damage, Entity.StatType.Current) * this.getDamageScaler());
-        int newHealth = Target.getStat(Entity.StatName.Health, Entity.StatType.Current) - damage;
-        //Apply Damage
-        Target.setStat(Entity.StatName.Health, Entity.StatType.Current,newHealth);
-        this.incrementCurrSpeed();
+    public void apply(Entity Owner, Entity Target,Attack parent) {
+        int damage =parent.getDamage() + (int) (Owner.getStat(Entity.StatName.Damage, Entity.StatType.Current) * parent.getDamageScaler());
+        Target.addStat(Entity.StatName.Health, Entity.StatType.Bonus,damage * -1);
     }
 }

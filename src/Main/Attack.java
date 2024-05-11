@@ -1,8 +1,10 @@
 package Main;
 
+import Attacks.AttackModule;
+
 import java.util.Comparator;
 
-public abstract class Attack {
+public class Attack {
     private String Name;
     private int Speed;
     private int Damage;
@@ -11,12 +13,15 @@ public abstract class Attack {
 
     private Entity Owner;
 
-    public Attack(String name, int speed, int damage,double damageScaler) {
+    private AttackModule attackModule;
+
+    public Attack(String name, int speed, int damage,double damageScaler, AttackModule attackModule) {
         Name = name;
         Speed = speed;
         Damage = damage;
         this.damageScaler = damageScaler;
         CurrSpeed = Speed;
+        this.attackModule = attackModule;
     }
 
     public Attack resetCurrSpeed(){
@@ -47,7 +52,10 @@ public abstract class Attack {
         return this;
     }
 
-    public abstract void apply(Entity Owner, Entity Target);
+    public void apply(Entity Owner, Entity Target){
+        attackModule.apply(Owner,Target,this);
+        this.incrementCurrSpeed();
+    }
 
     public String getName() {
         return Name;
@@ -92,7 +100,7 @@ public abstract class Attack {
     }
 
     public Attack setOwner(Entity owner) {
-        if(owner!= null) throw new ClassCastException("Attack Already Has an Owner");
+        if(Owner!= null) throw new ClassCastException("Attack Already Has an Owner");
         Owner = owner;
         return this;
     }

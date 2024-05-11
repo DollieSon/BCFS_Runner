@@ -19,7 +19,7 @@ public class Entity {
     public enum StatType{
         Base,
         Bonus,
-        Current
+        Current,
     }
 
     public Entity(String Name,int Health,int Speed,int Damage){
@@ -67,6 +67,28 @@ public class Entity {
                 return this;
         }
         Stat[st.ordinal()] = number;
+        if(st == StatType.Bonus) Stat[StatType.Current.ordinal()] = Stat[StatType.Base.ordinal()] + Stat[StatType.Bonus.ordinal()];
+        return this;
+    }
+
+    public Entity addStat(StatName Sn, StatType st, int number){
+        int[] Stat;
+        switch (Sn){
+            case Health:
+                Stat = Health;
+                break;
+            case Speed:
+                Stat = Speed;
+                break;
+            case Damage:
+                Stat = Damage;
+                break;
+            default:
+                //throw error
+                return this;
+        }
+        Stat[st.ordinal()] += number;
+        if(st == StatType.Bonus) Stat[StatType.Current.ordinal()] = Stat[StatType.Base.ordinal()] + Stat[StatType.Bonus.ordinal()];
         return this;
     }
     public Attack getAttack(){
@@ -102,7 +124,7 @@ public class Entity {
             AttackString.append("\t\t" + attack.toString() + "\n");
         }
         return String.format("Name: %s \n\tHP: %d/%d \n\tDamage: %d\t%d\t%d\n\tSpeed: %d\t%d\t%d\n",
-                Name,getStat(StatName.Health,StatType.Current),getStat(StatName.Health,StatType.Base) + getStat(StatName.Health,StatType.Bonus),
+                Name,getStat(StatName.Health,StatType.Current),getStat(StatName.Health,StatType.Base),
                 //Damage
                 Damage[StatType.Base.ordinal()],Damage[StatType.Bonus.ordinal()],Damage[StatType.Current.ordinal()],
                 //Speed
