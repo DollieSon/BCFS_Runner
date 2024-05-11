@@ -1,6 +1,8 @@
 package Builders;
 
 import Attacks.AttackModule;
+import Attacks.Heal;
+import Attacks.Leech;
 import Attacks.SingleAttack;
 
 public class AttackModuleBuilder {
@@ -10,8 +12,14 @@ public class AttackModuleBuilder {
             case 1:
                 res = new SingleAttack();
                 break;
+            case 2:
+                res = new Leech();
+                break;
+            case 3:
+                res = new Heal();
+                break;
             default:
-                throw new IllegalStateException();
+                throw new IllegalStateException("attack module not found");
         }
         return res;
     }
