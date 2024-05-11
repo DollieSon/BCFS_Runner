@@ -110,7 +110,7 @@ public class Entity {
     public Entity resetCurrent(){
         int[][] AllStats = {damage, health, speed};
         for(int[] specStat : AllStats){
-            specStat[StatType.Bonus.ordinal()] = 0;
+            specStat[StatType.BONUS.ordinal()] = 0;
             specStat[StatType.CURRENT.ordinal()] =  specStat[StatType.BASE.ordinal()] +  specStat[StatType.BONUS.ordinal()];
         }
         for(Attack atk: attacklist){
