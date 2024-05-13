@@ -10,7 +10,7 @@ public class Entity {
     private int[] health;
     private int[] speed;
     private int[] damage;
-
+    private int OwnerID;
     public enum StatName {
         HEALTH,
         SPEED,
@@ -22,13 +22,14 @@ public class Entity {
         CURRENT,
     }
 
-    public Entity(String name, int health, int speed, int damage){
+    public Entity(String name, int health, int speed, int damage,int ownerID){
         this.name = name;
         //Base,Bonus,Curr
         this.health = new int[]{health, 0, health};
         this.speed = new int[]{speed, 0, speed};
         this.damage = new int[]{damage, 0, damage};
         this.attackList = new ArrayList<>();
+        OwnerID = ownerID;
     }
 
     public int getStat(StatName statName, StatType statType){
@@ -132,5 +133,11 @@ public class Entity {
                 speed[StatType.BASE.ordinal()], speed[StatType.BONUS.ordinal()], speed[StatType.CURRENT.ordinal()]
         )
                 + AttackString;
+    }
+    public ArrayList<Attack> getAttackList(){
+        return attackList;
+    }
+    public int getOwnerID(){
+        return OwnerID;
     }
 }

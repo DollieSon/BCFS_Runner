@@ -5,16 +5,16 @@ import Attacks.AttackModule;
 import java.util.Comparator;
 
 public class Attack {
+    private int AttackID;
     private String name;
     private int speed;
     private int damage;
     private double damageMultiplier;
     private int currSpeed;
-
     private Entity owner;
     private AttackModule attackModule;
 
-    public Attack(String name, int speed, int damage,double damageMultiplier, AttackModule attackModule) {
+    public Attack(String name, int speed, int damage,double damageMultiplier, AttackModule attackModule,int AttackID) {
         this.name = name;
         this.speed = speed;
         this.damage = damage;
@@ -102,5 +102,13 @@ public class Attack {
         if(this.owner != null) throw new ClassCastException("Attack Already Has an Owner");
         this.owner = owner;
         return this;
+    }
+
+    public AttackModule getAttackModule() {
+        return attackModule;
+    }
+
+    public int getAttackID(){
+        return AttackID;
     }
 }
