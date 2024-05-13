@@ -31,6 +31,9 @@ public class Entity {
         this.attackList = new ArrayList<>();
         OwnerID = ownerID;
     }
+    public Entity(String Name,int OwnerID){
+        this(Name,100,5,5,OwnerID);
+    }
 
     public int getStat(StatName statName, StatType statType){
         int[] Stat;

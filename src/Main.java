@@ -9,12 +9,9 @@ public class Main {
     public static void main(String[] args) {
         DBHelpers.setGlobalConnection(new LocalHostConnection());
         DBHelpers dbh = new DBHelpers(DBHelpers.getGlobalConnection());
-        HashMap<Integer,Attack> allAttacks = dbh.getAllAttacks();
-        dbh.LoginUser("PcResting","12345");
-        Attack Bash = AttackHelper.cloneAttack(allAttacks.get(1));
-        Entity cock = new Entity("Cockers",100,10,5,User.getCurrUser().getUserID());
-        cock.addAttack(Bash);
-        dbh.SendCockData(cock);
+
+
+        dbh.getAllCockData();
 
     }
     public void Test2(){
