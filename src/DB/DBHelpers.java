@@ -10,11 +10,17 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 
-public class AttacksTable {
+public class DBHelpers {
 
-    public static HashMap<Integer,Attack> getAllAttacks(){
+    private DBConnection dbConnection;
+
+    public DBHelpers(DBConnection dbConnection) {
+        this.dbConnection = dbConnection;
+    }
+
+    public HashMap<Integer, Attack> getAllAttacks(){
         HashMap<Integer,Attack> allAttacks = new HashMap<>();
-        try(Connection C = MySQLConnection.getConnection();
+        try(Connection C = dbConnection.getConnection();
             Statement statement = C.createStatement()){
             String querry = "SELECT * FROM tblattack";
             ResultSet rs = statement.executeQuery(querry);

@@ -4,10 +4,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class MySQLConnection implements DBConnection{
-
-    public static final String URL = "jdbc:mysql://192.168.1.13:3306/bcfs";
-    public static final String USERNAME = "client";
+public class LocalHostConnection implements DBConnection{
+    public static final String URL = "jdbc:mysql://localhost:3306/bcfs";
+    public static final String USERNAME = "root";
     public static final String PASSSWORD = "";
 
     public Connection getConnection(){

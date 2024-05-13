@@ -1,14 +1,13 @@
 import Attacks.Heal;
-import Attacks.Leech;
 import Attacks.SingleAttack;
-import DB.AttacksTable;
+import DB.DBHelpers;
+import DB.LocalHostConnection;
 import Main.*;
-
-import java.sql.Connection;
 
 public class Main {
     public static void main(String[] args) {
-        AttacksTable.getAllAttacks();
+        DBHelpers dbh = new DBHelpers(new LocalHostConnection());
+
     }
 
     public void Test1(){
