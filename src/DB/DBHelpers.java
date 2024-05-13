@@ -3,11 +3,9 @@ package DB;
 import Attacks.AttackModule;
 import Builders.AttackModuleBuilder;
 import Main.Attack;
+import Main.User;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.HashMap;
 
 public class DBHelpers {
@@ -40,4 +38,37 @@ public class DBHelpers {
         }
         return allAttacks;
     }
+
+    public boolean CreateAccount(String DisplayName,String Username,String Password){
+        boolean isSuccessful = false;
+        try(Connection c = dbConnection.getConnection();
+            PreparedStatement ps = c.prepareStatement("INSERT INTO `tbluser` (`DisplayName`, `Username`, `Password`) VALUES ( ?, ?, ?)")){
+            ps.setString(1,DisplayName);
+            ps.setString(2,Username);
+            ps.setString(3,Password);
+            isSuccessful = ps.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }finally {
+        }
+        return isSuccessful;
+    }
+
+    public User LoginUser(String Username, String Password){
+        User result = null;
+        try(Connection c = dbConnection.getConnection();
+            PreparedStatement ps = c.prepareStatement("SELECT UserID,DisplayName FROM tbluser WHERE Username = ? AND Password = ?")){
+            ps.setString(1,Username);
+            ps.setString(2,Password);
+            ResultSet rs =  ps.executeQuery();
+            rs.next();
+            int UID = rs.getInt("UserID");
+            String DisplayName = rs.getString("DisplayName");
+            result = new User(DisplayName,UID);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
 }

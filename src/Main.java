@@ -7,7 +7,12 @@ import Main.*;
 public class Main {
     public static void main(String[] args) {
         DBHelpers dbh = new DBHelpers(new LocalHostConnection());
-
+        dbh.getAllAttacks();
+        dbh.LoginUser("PcResting","12345");
+    }
+    public void Test2(){
+        DBHelpers dbh = new DBHelpers(new LocalHostConnection());
+        //dbh.CreateAccount("PcRestarting","PcResting","12345"); // Create Account
     }
 
     public void Test1(){
