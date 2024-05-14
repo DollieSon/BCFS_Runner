@@ -11,7 +11,7 @@ public class Attack {
     private int damage;
     private double damageMultiplier;
     private int currSpeed;
-    private Entity owner;
+    private Cock owner;
     private AttackModule attackModule;
 
     public Attack(String name, int speed, int damage,double damageMultiplier, AttackModule attackModule,int AttackID) {
@@ -51,7 +51,7 @@ public class Attack {
         return this;
     }
 
-    public void apply(Entity owner, Entity target){
+    public void apply(Cock owner, Cock target){
         attackModule.apply(owner, target, this);
         this.incrementCurrSpeed();
     }
@@ -94,11 +94,11 @@ public class Attack {
         return this;
     }
 
-    public Entity getOwner() {
+    public Cock getOwner() {
         return owner;
     }
 
-    public Attack setOwner(Entity owner) {
+    public Attack setOwner(Cock owner) {
         if(this.owner != null) throw new ClassCastException("Attack Already Has an Owner");
         this.owner = owner;
         return this;

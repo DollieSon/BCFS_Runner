@@ -4,13 +4,13 @@ import Main.*;
 
 public class Leech implements AttackModule{
 
-    public void apply(Entity owner, Entity target, Attack parent) {
-        int damage = parent.getDamage() + (int) (owner.getStat(Entity.StatName.DAMAGE, Entity.StatType.CURRENT) * parent.getDamageMultiplier());
-        int newHealth = target.getStat(Entity.StatName.HEALTH, Entity.StatType.BONUS) - damage;
+    public void apply(Cock owner, Cock target, Attack parent) {
+        int damage = parent.getDamage() + (int) (owner.getStat(Cock.StatName.DAMAGE, Cock.StatType.CURRENT) * parent.getDamageMultiplier());
+        int newHealth = target.getStat(Cock.StatName.HEALTH, Cock.StatType.BONUS) - damage;
         //Apply Damage
-        target.setStat(Entity.StatName.HEALTH, Entity.StatType.BONUS,newHealth);
+        target.setStat(Cock.StatName.HEALTH, Cock.StatType.BONUS,newHealth);
         // Heal Owner
-        owner.setStat(Entity.StatName.HEALTH, Entity.StatType.BONUS,damage);
+        owner.setStat(Cock.StatName.HEALTH, Cock.StatType.BONUS,damage);
     }
 
 

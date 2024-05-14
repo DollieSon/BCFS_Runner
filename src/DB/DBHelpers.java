@@ -4,7 +4,7 @@ import Attacks.AttackHelper;
 import Attacks.AttackModule;
 import Builders.AttackModuleBuilder;
 import Main.Attack;
-import Main.Entity;
+import Main.Cock;
 import Main.User;
 
 import java.sql.*;
@@ -81,11 +81,11 @@ public class DBHelpers {
         return User.getCurrUser();
     }
 
-    public boolean SendCockData(Entity cock) {
+    public boolean SendCockData(Cock cock) {
         ArrayList<Attack> lists = cock.getAttackList();
         boolean result = false;
         try (Connection c = dbConnection.getConnection();
-             PreparedStatement ps = c.prepareStatement("INSERT INTO `tblcock` (`UserID`, `CockName`, `Attack1ID`, `Attack2ID`, `Attack3ID`, `Attaclk4ID`) VALUES (?, ?, ? , ? , ? , ?)")) {
+             PreparedStatement ps = c.prepareStatement("INSERT INTO `tblcock` (`UserID`, `CockName`, `Attack1ID`, `Attack2ID`, `Attack3ID`, `Attack4ID`) VALUES (?, ?, ? , ? , ? , ?)")) {
             int startInd = 3;
             ps.setInt(1, cock.getOwnerID());
             ps.setString(2, cock.getName());
@@ -93,26 +93,52 @@ public class DBHelpers {
                 int atkID = AttackHelper.attackModuleToInt(atk.getAttackModule());
                 ps.setInt(startInd++, atkID);
             }
-            while (startInd-2 <= Entity.MAX_ATTACKS) {
+            while (startInd-2 <= Cock.MAX_ATTACKS) {
                 ps.setInt(startInd++, 0);
             }
             System.out.println(ps.toString());
             ps.execute();
             System.out.println("Cock Insert Successfull");
+            // fetch cockdata
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return result;
     }
 
-    public HashMap<Integer,Entity> getAllCockData(){
-        HashMap<Integer,Entity> cockData = null;
+    public int getCockID(Cock cock){
+            ArrayList<Attack> lists = cock.getAttackList();
+            int res = 0;
+            try(Connection C = dbConnection.getConnection();
+            PreparedStatement ps = C.prepareStatement("SELECT CockID FROM tblcock WHERE UserID = ? AND CockName = ? AND Attack1ID = ? AND Attack2ID = ? AND Attack3ID = ? AND Attack4ID = ?")) {
+                ps.setInt(1,cock.getOwnerID());
+                ps.setString(2,cock.getName());
+                int startInd = 3;
+                for(Attack atk: lists){
+                    ps.setInt(startInd++,AttackHelper.attackModuleToInt(atk.getAttackModule()));
+                }
+                while(startInd-2 <= Cock.MAX_ATTACKS){
+                    ps.setInt(startInd++,0);
+                }
+                ResultSet rs = ps.executeQuery();
+                while(rs.next()){
+                    cock.setCockID(rs.getInt("CockID"));
+                }
+                res = cock.getCockID();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            return res;
+    }
+
+    public HashMap<Integer, Cock> getAllCockData(){
+        HashMap<Integer, Cock> cockData = null;
         try(Connection c = dbConnection.getConnection();
             PreparedStatement ps = c.prepareStatement("SELECT * FROM tblcock")){
             ResultSet rs = ps.executeQuery();
             cockData = new HashMap<>();
             while(rs.next()){
-                Entity cock = new Entity(
+                Cock cock = new Cock(
                         rs.getString("CockName"),
                         rs.getInt("UserID")
                 );
@@ -125,10 +151,31 @@ public class DBHelpers {
                 }
                 cockData.put(rs.getInt("CockID"),cock);
             }
-            System.out.println("Fetched " + rs.getRow() + " Cocks");
+            System.out.println("Cocks Fetched Successfully");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return cockData;
+    }
+
+    public boolean ChallangePlayer(boolean isChallenge , Cock cock,int referenceID){
+        boolean isSuccess = false;
+        try(Connection C = dbConnection.getConnection();
+            PreparedStatement ps = C.prepareStatement("INSERT INTO `tblinvite` (`UserID`, `CockID`, `isChallenge`, `referenceID`) VALUES (?, ?, ?, ?)")){
+            ps.setInt(1,cock.getOwnerID());
+            // If cock already exists in database
+            getCockID(cock);
+            if(cock.getCockID() == 0){
+                SendCockData(cock);
+                getCockID(cock);
+            }
+            ps.setInt(2,cock.getCockID());
+            ps.setBoolean(3,isChallenge);
+            ps.setInt(4,referenceID);
+            ps.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return isSuccess;
     }
 }

@@ -1,24 +1,24 @@
 package Main;
 
 public class Helpers {
-    public static void Fight(Entity player, Entity enemy){
+    public static void Fight(Cock player, Cock enemy){
         //reset Player Health
         player.resetCurrent();
         //reset Enemy Health
         player.resetCurrent();
         while(true) {
-            if(player.getStat(Entity.StatName.HEALTH, Entity.StatType.CURRENT) <= 0){
+            if(player.getStat(Cock.StatName.HEALTH, Cock.StatType.CURRENT) <= 0){
                 System.out.println("Player Died");
                 return;
             }
-            if(enemy.getStat(Entity.StatName.HEALTH, Entity.StatType.CURRENT) <= 0){
+            if(enemy.getStat(Cock.StatName.HEALTH, Cock.StatType.CURRENT) <= 0){
                 System.out.println("Enemy Died");
                 return;
             }
             Attack PlayerAttack = player.getAttack();
             Attack EnemyAttack = enemy.getAttack();
-            int player_attackSpeed = PlayerAttack.getCurrSpeed() + player.getStat(Entity.StatName.SPEED, Entity.StatType.CURRENT);
-            int entity_attackSpeed = EnemyAttack.getCurrSpeed() + enemy.getStat(Entity.StatName.SPEED, Entity.StatType.CURRENT);
+            int player_attackSpeed = PlayerAttack.getCurrSpeed() + player.getStat(Cock.StatName.SPEED, Cock.StatType.CURRENT);
+            int entity_attackSpeed = EnemyAttack.getCurrSpeed() + enemy.getStat(Cock.StatName.SPEED, Cock.StatType.CURRENT);
             if(player_attackSpeed <= entity_attackSpeed){
                 System.out.println(player.getName() + "Attacks with " + PlayerAttack.getName());
                 PlayerAttack.apply(player,enemy);

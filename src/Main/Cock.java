@@ -3,7 +3,7 @@ package Main;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class Entity {
+public class Cock {
     public static int MAX_ATTACKS = 4;
     private String name;
     private ArrayList<Attack> attackList;
@@ -11,6 +11,7 @@ public class Entity {
     private int[] speed;
     private int[] damage;
     private int OwnerID;
+    private int CockID;
     public enum StatName {
         HEALTH,
         SPEED,
@@ -22,7 +23,21 @@ public class Entity {
         CURRENT,
     }
 
-    public Entity(String name, int health, int speed, int damage,int ownerID){
+    public Cock setOwnerID(int ownerID) {
+        OwnerID = ownerID;
+        return this;
+    }
+
+    public int getCockID() {
+        return CockID;
+    }
+
+    public Cock setCockID(int cockID) {
+        CockID = cockID;
+        return this;
+    }
+
+    public Cock(String name, int health, int speed, int damage, int ownerID){
         this.name = name;
         //Base,Bonus,Curr
         this.health = new int[]{health, 0, health};
@@ -30,8 +45,9 @@ public class Entity {
         this.damage = new int[]{damage, 0, damage};
         this.attackList = new ArrayList<>();
         OwnerID = ownerID;
+        CockID = 0;
     }
-    public Entity(String Name,int OwnerID){
+    public Cock(String Name, int OwnerID){
         this(Name,100,5,5,OwnerID);
     }
 
@@ -54,7 +70,7 @@ public class Entity {
         return Stat[statType.ordinal()];
     }
 
-    public Entity setStat(StatName statName, StatType statType, int number){
+    public Cock setStat(StatName statName, StatType statType, int number){
         int[] Stat;
         switch (statName) {
             case HEALTH:
@@ -75,7 +91,7 @@ public class Entity {
         return this;
     }
 
-    public Entity addStat(StatName statName, StatType statType, int number){
+    public Cock addStat(StatName statName, StatType statType, int number){
         int[] Stat;
         switch (statName){
             case HEALTH:
@@ -99,7 +115,7 @@ public class Entity {
         Collections.sort(attackList,new Attack.sortBySpeed());
         return attackList.get(0);
     }
-    public Entity addAttack(Attack newAttack) throws ArrayIndexOutOfBoundsException{
+    public Cock addAttack(Attack newAttack) throws ArrayIndexOutOfBoundsException{
         if(attackList.size() > MAX_ATTACKS){
             throw new ArrayIndexOutOfBoundsException("AttackList is Full");
         }
@@ -111,7 +127,7 @@ public class Entity {
     public String getName() {
         return name;
     }
-    public Entity resetCurrent(){
+    public Cock resetCurrent(){
         int[][] AllStats = {damage, health, speed};
         for(int[] specStat : AllStats){
             specStat[StatType.BONUS.ordinal()] = 0;

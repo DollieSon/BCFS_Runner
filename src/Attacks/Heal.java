@@ -1,14 +1,14 @@
 package Attacks;
 
 import Main.Attack;
-import Main.Entity;
+import Main.Cock;
 
 public class Heal implements AttackModule{
 
     @Override
-    public void apply(Entity owner, Entity target, Attack parent) {
-        int damage = parent.getDamage() + (int) (owner.getStat(Entity.StatName.DAMAGE, Entity.StatType.CURRENT) * parent.getDamageMultiplier());
-        int newHealth = owner.getStat(Entity.StatName.HEALTH, Entity.StatType.BONUS) + damage;
-        owner.setStat(Entity.StatName.HEALTH, Entity.StatType.BONUS, newHealth);
+    public void apply(Cock owner, Cock target, Attack parent) {
+        int damage = parent.getDamage() + (int) (owner.getStat(Cock.StatName.DAMAGE, Cock.StatType.CURRENT) * parent.getDamageMultiplier());
+        int newHealth = owner.getStat(Cock.StatName.HEALTH, Cock.StatType.BONUS) + damage;
+        owner.setStat(Cock.StatName.HEALTH, Cock.StatType.BONUS, newHealth);
     }
 }

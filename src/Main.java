@@ -3,6 +3,7 @@ import DB.DBHelpers;
 import DB.LocalHostConnection;
 import Main.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Main {
@@ -10,9 +11,13 @@ public class Main {
         DBHelpers.setGlobalConnection(new LocalHostConnection());
         DBHelpers dbh = new DBHelpers(DBHelpers.getGlobalConnection());
 
+        dbh.LoginUser("PcResting","12345");
 
-        dbh.getAllCockData();
-
+        Cock mine = new Cock("Hello",100,10,1,User.getCurrUser().getUserID());
+        HashMap<Integer,Attack> allAttacks = dbh.getAllAttacks();
+        mine.addAttack(AttackHelper.cloneAttack(allAttacks.get(1)));
+        mine.addAttack(AttackHelper.cloneAttack(allAttacks.get(2)));
+        dbh.ChallangePlayer(true,mine,2);
     }
     public void Test2(){
         DBHelpers dbh = new DBHelpers(new LocalHostConnection());
@@ -26,7 +31,7 @@ public class Main {
         HashMap<Integer,Attack> allAttacks = dbh.getAllAttacks();
         dbh.LoginUser("PcResting","12345");
         Attack Bash = AttackHelper.cloneAttack(allAttacks.get(1));
-        Entity cock = new Entity("Cockers",100,10,5,User.getCurrUser().getUserID());
+        Cock cock = new Cock("Cockers",100,10,5,User.getCurrUser().getUserID());
         cock.addAttack(Bash);
         dbh.SendCockData(cock);
 

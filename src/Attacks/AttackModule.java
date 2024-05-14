@@ -1,8 +1,8 @@
 package Attacks;
 
 import Main.Attack;
-import Main.Entity;
+import Main.Cock;
 
 public interface AttackModule {
-     void apply(Entity Owner, Entity Target, Attack parent);
+     void apply(Cock Owner, Cock Target, Attack parent);
 }
