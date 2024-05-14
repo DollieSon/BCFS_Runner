@@ -195,6 +195,8 @@ public class DBHelpers {
         }
     }
 
+
+
     public boolean updateDetails(int userID, String displayName, String username, String Password){
         try(Connection C = dbConnection.getConnection();
             PreparedStatement ps = C.prepareStatement("UPDATE tbluser Set DisplayName = ?, Username = ?, Password = ? where UserID = ?")){
@@ -203,6 +205,23 @@ public class DBHelpers {
             ps.setString(3,Password);
             ps.setInt(4,userID);
             return ps.execute();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public String getDisplayName(int userid){
+//        returns displayname given userid
+
+        try(Connection C = dbConnection.getConnection();
+            PreparedStatement ps = C.prepareStatement("Select DisplayName from tbluser where UserID = ?")){
+            ps.setInt(1,userid);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()){
+                return rs.getString("DisplayName");
+            }
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
