@@ -195,10 +195,19 @@ public class DBHelpers {
         }
     }
 
+    public boolean updateDetails(int userID, String displayName, String username, String Password){
+        try(Connection C = dbConnection.getConnection();
+            PreparedStatement ps = C.prepareStatement("UPDATE tbluser Set DisplayName = ?, Username = ?, Password = ? where UserID = ?")){
+            ps.setString(1,displayName);
+            ps.setString(2,username);
+            ps.setString(3,Password);
+            ps.setInt(4,userID);
+            return ps.execute();
 
-
-
-
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
 }
