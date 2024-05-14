@@ -178,4 +178,27 @@ public class DBHelpers {
         }
         return isSuccess;
     }
+    public ArrayList<Integer> getChallenges(int userID){
+        ArrayList<Integer> inviteIds = new ArrayList<>();
+
+        try(Connection C = dbConnection.getConnection();
+            PreparedStatement ps = C.prepareStatement("Select InviteID from tblinvite where isChallenge = 1 and referenceID = ?")){
+            ps.setInt(1,userID);
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+                inviteIds.add(rs.getInt("tblinvite"));
+            }
+            return inviteIds;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
+
+
+
+
 }
