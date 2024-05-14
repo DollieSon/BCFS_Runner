@@ -19,4 +19,14 @@ public class LocalHostConnection implements DBConnection{
         }
         return c;
     }
+
+    public static void main(String[] args) {
+        Connection c = null;
+        try{
+            c= DriverManager.getConnection(URL, USERNAME,PASSSWORD);
+            System.out.println("DB Connection Success");
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
 }

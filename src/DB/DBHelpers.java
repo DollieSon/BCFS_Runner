@@ -158,7 +158,7 @@ public class DBHelpers {
         return cockData;
     }
 
-    public boolean ChallangePlayer(boolean isChallenge , Cock cock,int referenceID){
+    public boolean ChallengePlayer(boolean isChallenge , Cock cock, int referenceID){
         boolean isSuccess = false;
         try(Connection C = dbConnection.getConnection();
             PreparedStatement ps = C.prepareStatement("INSERT INTO `tblinvite` (`UserID`, `CockID`, `isChallenge`, `referenceID`) VALUES (?, ?, ?, ?)")){
@@ -214,19 +214,73 @@ public class DBHelpers {
 
     public String getDisplayName(int userid){
 //        returns displayname given userid
+        //returns null if user id doesn't exists
 
-        try(Connection C = dbConnection.getConnection();
-            PreparedStatement ps = C.prepareStatement("Select DisplayName from tbluser where UserID = ?")){
+        try(Connection C = dbConnection.getConnection();){
+            PreparedStatement ps = C.prepareStatement("Select DisplayName from tbluser where UserID = ?");
             ps.setInt(1,userid);
             ResultSet rs = ps.executeQuery();
             while (rs.next()){
                 return rs.getString("DisplayName");
             }
 
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        return null;
     }
 
 
+        public void acceptInvite(int inviteID, int inviteeCockID) {
+            //update invite ID to be accepted
+            // invtiee should create a cock
+            // get the id of the created cock
+            //pass these values to the tblmatch
+
+            try (Connection c = dbConnection.getConnection();) {
+                PreparedStatement ps = c.prepareStatement("Update tblinvite Set isAccepted = ? where InviteID = ?");
+                ps.setBoolean(1, true);
+                ps.setInt(2, inviteID);
+                ps.execute();
+
+                int invitorCockID = getInvitorCockID(inviteID);
+                if(invitorCockID!=-1){
+                    insertMatch(invitorCockID,inviteeCockID);
+                }
+
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+
+        public int getInvitorCockID(int inviteID){
+            try (Connection c = dbConnection.getConnection();) {
+                PreparedStatement ps = c.prepareStatement("Select CockID from tblinvite where InviteID = ?");
+                ps.setInt(  1, inviteID);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()){
+                    return rs.getInt("CockID");
+                }
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            return -1; //returns -1 if error occurs
+        }
+
+        public boolean insertMatch(int invitorCockID, int inviteeCockId){
+            try (Connection c = dbConnection.getConnection();) {
+                PreparedStatement ps = c.prepareStatement("Insert into tblmatch(invitorCockID, inviteeCockID) values (?,?)");
+                ps.setInt(  1, invitorCockID);
+                ps.setInt(  1, inviteeCockId);
+                return ps.execute();
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
 }

@@ -17,7 +17,7 @@ public class Main {
         HashMap<Integer,Attack> allAttacks = dbh.getAllAttacks();
         mine.addAttack(AttackHelper.cloneAttack(allAttacks.get(1)));
         mine.addAttack(AttackHelper.cloneAttack(allAttacks.get(2)));
-        dbh.ChallangePlayer(true,mine,2);
+        dbh.ChallengePlayer(true,mine,2);
     }
     public void Test2(){
         DBHelpers dbh = new DBHelpers(new LocalHostConnection());
