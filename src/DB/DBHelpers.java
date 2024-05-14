@@ -187,7 +187,7 @@ public class DBHelpers {
             ResultSet rs = ps.executeQuery();
 
             while(rs.next()){
-                inviteIds.add(rs.getInt("tblinvite"));
+                inviteIds.add(rs.getInt("InviteID"));
             }
             return inviteIds;
         } catch (SQLException e) {

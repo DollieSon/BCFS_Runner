@@ -11,13 +11,8 @@ public class Main {
         DBHelpers.setGlobalConnection(new LocalHostConnection());
         DBHelpers dbh = new DBHelpers(DBHelpers.getGlobalConnection());
 
-        dbh.LoginUser("PcResting","12345");
-
-        Cock mine = new Cock("Hello",100,10,1,User.getCurrUser().getUserID());
-        HashMap<Integer,Attack> allAttacks = dbh.getAllAttacks();
-        mine.addAttack(AttackHelper.cloneAttack(allAttacks.get(1)));
-        mine.addAttack(AttackHelper.cloneAttack(allAttacks.get(2)));
-        dbh.ChallangePlayer(true,mine,2);
+        ArrayList<Integer> challenges = dbh.getChallenges(2);
+        System.out.println("Done");
     }
     public void Test2(){
         DBHelpers dbh = new DBHelpers(new LocalHostConnection());
@@ -35,5 +30,16 @@ public class Main {
         cock.addAttack(Bash);
         dbh.SendCockData(cock);
 
+    }
+    public void Test4(){
+        DBHelpers.setGlobalConnection(new LocalHostConnection());
+        DBHelpers dbh = new DBHelpers(DBHelpers.getGlobalConnection());
+
+        dbh.LoginUser("PcResting","12345");
+        Cock mine = new Cock("Hello",100,10,1,User.getCurrUser().getUserID());
+        HashMap<Integer,Attack> allAttacks = dbh.getAllAttacks();
+        mine.addAttack(AttackHelper.cloneAttack(allAttacks.get(1)));
+        mine.addAttack(AttackHelper.cloneAttack(allAttacks.get(2)));
+        dbh.ChallangePlayer(true,mine,2);
     }
 }
