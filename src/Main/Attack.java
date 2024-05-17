@@ -14,13 +14,17 @@ public class Attack {
     private Cock owner;
     private AttackModule attackModule;
 
-    public Attack(String name, int speed, int damage,double damageMultiplier, AttackModule attackModule,int AttackID) {
+    public Attack(String name, int speed, int damage,double damageMultiplier, AttackModule attackModule) {
         this.name = name;
         this.speed = speed;
         this.damage = damage;
         this.damageMultiplier = damageMultiplier;
         currSpeed = this.speed;
         this.attackModule = attackModule;
+    }
+    public Attack(String name, int speed, int damage,double damageMultiplier, AttackModule attackModule,int AttackID) {
+       this(name, speed, damage, damageMultiplier, attackModule);
+       this.AttackID = AttackID;
     }
 
     public Attack resetCurrSpeed(){
