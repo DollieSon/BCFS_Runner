@@ -285,4 +285,55 @@ public class DBHelpers {
                 throw new RuntimeException(e);
             }
         }
+
+        public boolean valueExists(String tablename, String columnname, String value){
+            try (Connection c = dbConnection.getConnection();) {
+                PreparedStatement ps = c.prepareStatement("Select * from ? where ? = ?");
+                ps.setString(1,tablename);
+                ps.setString(2, columnname);
+                ps.setString(3,value);
+                ResultSet rs = ps.executeQuery();
+                int number_of_rows = rs.getRow();
+                return number_of_rows!=0;
+
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public int createAccount(String DisplayName,String Username, String Password){
+            try (Connection c = dbConnection.getConnection();) {
+                boolean usernameExists = valueExists("tbluser","Username",Username);
+                if(usernameExists ){
+                    System.out.println("Username already exists");
+                    return -1;
+                }else{
+                    PreparedStatement ps = c.prepareStatement("Insert into tbluser(Displayname,Username,Password) values (?,?,?)");
+                    ps.setString(1,DisplayName);
+                    ps.setString(2,Username);
+                    ps.setString(3,Password);
+                    ps.execute();
+                    return getUserId(Username);
+                }
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public int getUserId(String username){
+            try (Connection c = dbConnection.getConnection();) {
+                PreparedStatement ps = c.prepareStatement("Select UserID from tbluser where Username=?");
+                ps.setString(1,username);
+                ResultSet rs = ps.executeQuery();
+                while(rs.next()){
+                    return rs.getInt("UserID");
+                }
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            return -1;
+        }
 }
