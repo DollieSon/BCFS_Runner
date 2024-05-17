@@ -14,7 +14,7 @@ import java.util.HashMap;
 public class DBHelpers {
 
     /**is an interface to allow modularity in connections**/
-    private DBConnection dbConnection;
+    private static DBConnection dbConnection;
     /**to allow a unified connection when constructing DBHelpers <br> DBHelpers dbh = new DBHelpers(DBHelpers.getGlobalConnection()) <br> So that we can easily change from supabase to localhost for testing<**/
     private static DBConnection globalConnection;
     public DBHelpers(DBConnection dbConnection) {
@@ -52,21 +52,7 @@ public class DBHelpers {
         return allAttacks;
     }
 
-    public boolean CreateAccount(String DisplayName, String Username, String Password) {
-        boolean isSuccessful = false;
-        try (Connection c = dbConnection.getConnection();
-             PreparedStatement ps = c.prepareStatement("INSERT INTO `tbluser` (`DisplayName`, `Username`, `Password`) VALUES ( ?, ?, ?)")) {
-            ps.setString(1, DisplayName);
-            ps.setString(2, Username);
-            ps.setString(3, Password);
-            isSuccessful = ps.execute();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-        }
-        return isSuccessful;
-    }
-    public User LoginUser(String Username, String Password) {
+    public static User LoginUser(String Username, String Password) {
         try (Connection c = dbConnection.getConnection();
              PreparedStatement ps = c.prepareStatement("SELECT UserID,DisplayName FROM tbluser WHERE Username = ? AND Password = ?")) {
             ps.setString(1, Username);
@@ -82,7 +68,7 @@ public class DBHelpers {
         return User.getCurrUser();
     }
 
-    public boolean SendCockData(Cock cock) {
+    public static boolean SendCockData(Cock cock) {
         ArrayList<Attack> lists = cock.getAttackList();
         boolean result = false;
         try (Connection c = dbConnection.getConnection();
@@ -107,7 +93,7 @@ public class DBHelpers {
         return result;
     }
 
-    public int getCockID(Cock cock){
+    public static int getCockID(Cock cock){
             ArrayList<Attack> lists = cock.getAttackList();
             int res = 0;
             try(Connection C = dbConnection.getConnection();
@@ -132,7 +118,7 @@ public class DBHelpers {
             return res;
     }
 
-    public HashMap<Integer, Cock> getAllCockData(){
+    public static HashMap<Integer, Cock> getAllCockData(){
         HashMap<Integer, Cock> cockData = null;
         try(Connection c = dbConnection.getConnection();
             PreparedStatement ps = c.prepareStatement("SELECT * FROM tblcock")){
@@ -160,27 +146,71 @@ public class DBHelpers {
     }
 
     //TODO: Update, Using The Outdated tbl
-    public boolean ChallengePlayer(boolean isChallenge , Cock cock, int referenceID){
+    public static boolean challengePlayer(int invitorCockID,int inviteeID, int invitorID){
         boolean isSuccess = false;
-        try(Connection C = dbConnection.getConnection();
-            PreparedStatement ps = C.prepareStatement("INSERT INTO `tblinvite` (`UserID`, `CockID`, `isChallenge`, `referenceID`) VALUES (?, ?, ?, ?)")){
-            ps.setInt(1,cock.getOwnerID());
-            // If cock already exists in database
-            getCockID(cock);
-            if(cock.getCockID() == 0){
-                SendCockData(cock);
-                getCockID(cock);
-            }
-            ps.setInt(2,cock.getCockID());
-            ps.setBoolean(3,isChallenge);
-            ps.setInt(4,referenceID);
-            ps.execute();
+        try(Connection C = dbConnection.getConnection();){
+            PreparedStatement ps = C.prepareStatement("Insert into tblinvite(invitorCockID,inviteeID,invitorID) values(?,?,?)");
+            ps.setInt(1,invitorCockID);
+            ps.setInt(2,inviteeID);
+            ps.setInt(3,invitorID);
+            return ps.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return isSuccess;
     }
-    public ArrayList<Integer> getChallenges(int userID){
+
+
+    public static boolean acceptInvite(int inviteID, int inviteeCockID){
+        try(Connection C = dbConnection.getConnection();){
+            PreparedStatement ps = C.prepareStatement("UPDATE tblinvite set isAccepted = 1 where InviteID = ?");
+            ps.setInt(1,inviteID);
+            boolean isSuccess =  ps.execute();
+            if(isSuccess){
+                //createMatch
+                PreparedStatement ps1 = C.prepareStatement("Select invitorCockID from tblinvite where InviteID = ?");
+                ps1.setInt(1,inviteID);
+                ResultSet rs = ps1.executeQuery();
+                int invitorCockID = -1;
+                while(rs.next()){
+                    invitorCockID = rs.getInt("invitorCockID");
+                    break;
+                }
+
+                if(invitorCockID==-1){
+                    System.out.println("An Error occured while getting the invitorCockID");
+                    return false;
+                }else{
+                    createMatch(invitorCockID,inviteeCockID);
+                    return true;
+                }
+
+            }
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return false;
+    }
+
+
+
+
+    public static boolean createMatch(int invitorCockID, int inviteeCockID){
+
+        try(Connection C = dbConnection.getConnection();){
+            PreparedStatement ps = C.prepareStatement("Insert into tblmatch(invitorCockID,inviteeCockID) values (?,?)");
+            ps.setInt(1,invitorCockID);
+            ps.setInt(2,inviteeCockID);
+            return  ps.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
+    public static ArrayList<Integer> getChallenges(int userID){
         ArrayList<Integer> inviteIds = new ArrayList<>();
 
         try(Connection C = dbConnection.getConnection();
@@ -199,7 +229,7 @@ public class DBHelpers {
 
 
 
-    public boolean updateDetails(int userID, String displayName, String username, String Password){
+    public static boolean updateDetails(int userID, String displayName, String username, String Password){
         try(Connection C = dbConnection.getConnection();
             PreparedStatement ps = C.prepareStatement("UPDATE tbluser Set DisplayName = ?, Username = ?, Password = ? where UserID = ?")){
             ps.setString(1,displayName);
@@ -214,7 +244,7 @@ public class DBHelpers {
     }
 
 
-    public String getDisplayName(int userid){
+    public static String getDisplayName(int userid){
 //        returns displayname given userid
         //returns null if user id doesn't exists
 
@@ -235,31 +265,8 @@ public class DBHelpers {
     }
 
 
-        public void acceptInvite(int inviteID, int inviteeCockID) {
-            //update invite ID to be accepted
-            // invtiee should create a cock
-            // get the id of the created cock
-            //pass these values to the tblmatch
 
-            try (Connection c = dbConnection.getConnection();) {
-                PreparedStatement ps = c.prepareStatement("Update tblinvite Set isAccepted = ? where InviteID = ?");
-                ps.setBoolean(1, true);
-                ps.setInt(2, inviteID);
-                ps.execute();
-
-                int invitorCockID = getInvitorCockID(inviteID);
-                if(invitorCockID!=-1){
-                    insertMatch(invitorCockID,inviteeCockID);
-                }
-
-
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-
-        }
-
-        public int getInvitorCockID(int inviteID){
+        public static int getInvitorCockID(int inviteID){
             try (Connection c = dbConnection.getConnection();) {
                 PreparedStatement ps = c.prepareStatement("Select CockID from tblinvite where InviteID = ?");
                 ps.setInt(  1, inviteID);
@@ -274,7 +281,7 @@ public class DBHelpers {
             return -1; //returns -1 if error occurs
         }
 
-        public boolean insertMatch(int invitorCockID, int inviteeCockId){
+        public static boolean insertMatch(int invitorCockID, int inviteeCockId){
             try (Connection c = dbConnection.getConnection();) {
                 PreparedStatement ps = c.prepareStatement("Insert into tblmatch(invitorCockID, inviteeCockID) values (?,?)");
                 ps.setInt(  1, invitorCockID);
@@ -286,7 +293,7 @@ public class DBHelpers {
             }
         }
 
-        public boolean valueExists(String tablename, String columnname, String value){
+        public static boolean valueExists(String tablename, String columnname, String value){
             try (Connection c = dbConnection.getConnection();) {
                 PreparedStatement ps = c.prepareStatement("Select * from ? where ? = ?");
                 ps.setString(1,tablename);
@@ -302,7 +309,7 @@ public class DBHelpers {
             }
         }
 
-        public int createAccount(String DisplayName,String Username, String Password){
+        public static int createAccount(String DisplayName,String Username, String Password){
             try (Connection c = dbConnection.getConnection();) {
                 boolean usernameExists = valueExists("tbluser","Username",Username);
                 if(usernameExists ){
@@ -322,7 +329,7 @@ public class DBHelpers {
             }
         }
 
-        public int getUserId(String username){
+        public static int getUserId(String username){
             try (Connection c = dbConnection.getConnection();) {
                 PreparedStatement ps = c.prepareStatement("Select UserID from tbluser where Username=?");
                 ps.setString(1,username);
