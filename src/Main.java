@@ -3,21 +3,20 @@ import DB.DBHelpers;
 import DB.LocalHostConnection;
 import Main.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Main {
     public static void main(String[] args) {
-        DBHelpers.setGlobalConnection(new LocalHostConnection());
-        DBHelpers dbh = new DBHelpers(DBHelpers.getGlobalConnection());
+        //Get Connection
 
-        dbh.LoginUser("PcResting","12345");
+        //Login/Sign-Up
 
-        Cock mine = new Cock("Hello",100,10,1,User.getCurrUser().getUserID());
-        HashMap<Integer,Attack> allAttacks = dbh.getAllAttacks();
-        mine.addAttack(AttackHelper.cloneAttack(allAttacks.get(1)));
-        mine.addAttack(AttackHelper.cloneAttack(allAttacks.get(2)));
-        dbh.ChallengePlayer(true,mine,2);
+        /*
+        * 1. Create Cock
+        * 2. Challange Player
+        * 3. Get Challenges
+        * 4. */
+
     }
     public void Test2(){
         DBHelpers dbh = new DBHelpers(new LocalHostConnection());
@@ -36,4 +35,7 @@ public class Main {
         dbh.SendCockData(cock);
 
     }
+
+    //Changes from skeleton
+    //Login User changed from returning User to returning boolean(isSuccess) data can be accessed on User.getCurrUser;
 }
