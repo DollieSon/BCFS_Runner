@@ -13,7 +13,9 @@ import java.util.HashMap;
 
 public class DBHelpers {
 
+    /**is an interface to allow modularity in connections**/
     private DBConnection dbConnection;
+    /**to allow a unified connection when constructing DBHelpers <br> DBHelpers dbh = new DBHelpers(DBHelpers.getGlobalConnection()) <br> So that we can easily change from supabase to localhost for testing<**/
     private static DBConnection globalConnection;
     public DBHelpers(DBConnection dbConnection) {
         this.dbConnection = dbConnection;
@@ -64,7 +66,6 @@ public class DBHelpers {
         }
         return isSuccessful;
     }
-
     public User LoginUser(String Username, String Password) {
         try (Connection c = dbConnection.getConnection();
              PreparedStatement ps = c.prepareStatement("SELECT UserID,DisplayName FROM tbluser WHERE Username = ? AND Password = ?")) {
@@ -158,6 +159,7 @@ public class DBHelpers {
         return cockData;
     }
 
+    //TODO: Update, Using The Outdated tbl
     public boolean ChallengePlayer(boolean isChallenge , Cock cock, int referenceID){
         boolean isSuccess = false;
         try(Connection C = dbConnection.getConnection();
