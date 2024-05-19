@@ -13,8 +13,22 @@ public class Attack {
     private int currSpeed;
     private Cock owner;
     private AttackModule attackModule;
+    private boolean isDisabled;
 
-    public Attack(String name, int speed, int damage,double damageMultiplier, AttackModule attackModule) {
+    public boolean getIsDisabled() {
+        return isDisabled;
+    }
+
+    public Attack setAttackID(int attackID) {
+        AttackID = attackID;
+        return this;
+    }
+
+    public Attack setIsDisabled(boolean isDisabled) {
+        this.isDisabled = isDisabled;
+        return this;
+    }
+    public Attack(String name, int speed, int damage, double damageMultiplier, AttackModule attackModule) {
         this.name = name;
         this.speed = speed;
         this.damage = damage;

@@ -44,14 +44,16 @@ public class DBHelpers {
                 int Id = rs.getInt("attackID");
                 AttackModule AM = AttackModuleBuilder.buildAttackModule(attackModule);
                 Attack atk = new Attack(aName, aSpeed, aDamage, adamageMult, AM,Id);
+                atk.setAttackID(rs.getInt("attackID"));
+                atk.setIsDisabled(rs.getBoolean("isDisabled"));
                 allAttacks.put(Id, atk);
+
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return allAttacks;
     }
-
     public static User LoginUser(String Username, String Password) {
         try (Connection c = dbConnection.getConnection();
              PreparedStatement ps = c.prepareStatement("SELECT UserID,DisplayName FROM tbluser WHERE Username = ? AND Password = ?")) {
@@ -183,10 +185,7 @@ public class DBHelpers {
                     createMatch(invitorCockID,inviteeCockID);
                     return true;
                 }
-
             }
-
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -208,7 +207,32 @@ public class DBHelpers {
         }
     }
 
+    public boolean setWinner(int matchID, int WinnerID){
+        Boolean res;
+        try(Connection C = dbConnection.getConnection();
+            PreparedStatement ps = C.prepareStatement("UPDATE tblmatch SET winner = ? WHERE matchID = ?")){
+            ps.setInt(1,WinnerID);
+            ps.setInt(2,matchID);
+            res = ps.execute();
+            if(res){
+                res = res && DeletePreviousMatch(matchID);
+                return res;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return res;
+    }
 
+    private boolean DeletePreviousMatch(int matchID){
+        try(Connection C = dbConnection.getConnection();
+        PreparedStatement ps = C.prepareStatement("DELETE FROM tblmatch WHERE matchID = ?")){
+            ps.setInt(1,matchID);
+            return ps.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static ArrayList<Integer> getChallenges(int userID){
         ArrayList<Integer> inviteIds = new ArrayList<>();
@@ -302,8 +326,6 @@ public class DBHelpers {
                 ResultSet rs = ps.executeQuery();
                 int number_of_rows = rs.getRow();
                 return number_of_rows!=0;
-
-
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -342,5 +364,20 @@ public class DBHelpers {
                 throw new RuntimeException(e);
             }
             return -1;
+        }
+        public static boolean sendAttack(Attack atk){
+            boolean res = false;
+            try(Connection c = dbConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement("INSERT INTO tblattack(name,speed,damage,damageMultiplier,attackModule) values (?,?,?,?,?)")){
+                ps.setString(1,atk.getName());
+                ps.setInt(2,atk.getSpeed());
+                ps.setInt(3,atk.getDamage());
+                ps.setDouble(4,atk.getDamageMultiplier());
+                ps.setInt(5,AttackHelper.attackModuleToInt(atk.getAttackModule()));
+                res = ps.execute();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            return res;
         }
 }
