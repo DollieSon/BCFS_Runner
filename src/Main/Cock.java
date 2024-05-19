@@ -3,7 +3,7 @@ package Main;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class Cock {
+public class Cock implements Cloneable{
     public static int MAX_ATTACKS = 4;
     private String name;
     private ArrayList<Attack> attackList;
@@ -158,5 +158,26 @@ public class Cock {
     }
     public int getOwnerID(){
         return OwnerID;
+    }
+
+
+    @Override
+    public Cock clone() {
+        try {
+            Cock cloned = (Cock) super.clone();
+            // Deep clone the attackList
+            cloned.attackList = new ArrayList<>(this.attackList.size());
+            for (Attack attack : this.attackList) {
+                cloned.attackList.add(attack.clone()); // Assuming Attack implements Cloneable
+                attack.setOwner(cloned);
+            }
+            // Deep clone the arrays
+            cloned.health = this.health.clone();
+            cloned.speed = this.speed.clone();
+            cloned.damage = this.damage.clone();
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError("Cloning not supported", e);
+        }
     }
 }

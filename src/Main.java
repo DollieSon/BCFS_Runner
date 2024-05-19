@@ -3,20 +3,15 @@ import DB.DBHelpers;
 import DB.LocalHostConnection;
 import Main.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Main {
     public static void main(String[] args) {
-        //Get Connection
-
-        //Login/Sign-Up
-
-        /*
-        * 1. Create Cock
-        * 2. Challange Player
-        * 3. Get Challenges
-        * 4. */
-
+        DBHelpers.setGlobalConnection(new LocalHostConnection());
+        DBHelpers dbh = new DBHelpers(DBHelpers.getGlobalConnection());
+        ArrayList<Runnable> Matches = dbh.getAllUnverifiedMatches();
+        System.out.println("Done Getting Fights");
     }
     public void Test2(){
         DBHelpers dbh = new DBHelpers(new LocalHostConnection());

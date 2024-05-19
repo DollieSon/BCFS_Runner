@@ -5,6 +5,7 @@ import Attacks.AttackModule;
 import Builders.AttackModuleBuilder;
 import Main.Attack;
 import Main.Cock;
+import Main.Helpers;
 import Main.User;
 
 import java.sql.*;
@@ -191,10 +192,6 @@ public class DBHelpers {
         }
         return false;
     }
-
-
-
-
     public static boolean createMatch(int invitorCockID, int inviteeCockID){
 
         try(Connection C = dbConnection.getConnection();){
@@ -234,6 +231,28 @@ public class DBHelpers {
         }
     }
 
+    public ArrayList<Runnable> getAllUnverifiedMatches(){
+        try(Connection C = dbConnection.getConnection();
+            PreparedStatement ps = C.prepareStatement("SELECT * FROM tblmatch WHERE winner = 0")){
+            ResultSet res = ps.executeQuery();
+            HashMap<Integer,Cock> allCocks = getAllCockData();
+            ArrayList<Runnable> Matches = new ArrayList<>();
+            while(res.next()){
+                Cock cock1;
+                Cock cock2;
+                cock1 = allCocks.get(res.getInt("invitorCockID")).clone();
+                cock2 = allCocks.get(res.getInt("inviteeCockID")).clone();
+                Runnable matchRun = () ->{
+                    Helpers.Fight(cock1,cock2);
+                };
+                Matches.add(matchRun);
+            }
+            return Matches;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static ArrayList<Integer> getChallenges(int userID){
         ArrayList<Integer> inviteIds = new ArrayList<>();
 
@@ -250,8 +269,6 @@ public class DBHelpers {
             throw new RuntimeException(e);
         }
     }
-
-
 
     public static boolean updateDetails(int userID, String displayName, String username, String Password){
         try(Connection C = dbConnection.getConnection();
@@ -287,97 +304,107 @@ public class DBHelpers {
 
         return null;
     }
-
-
-
-        public static int getInvitorCockID(int inviteID){
-            try (Connection c = dbConnection.getConnection();) {
-                PreparedStatement ps = c.prepareStatement("Select CockID from tblinvite where InviteID = ?");
-                ps.setInt(  1, inviteID);
-                ResultSet rs = ps.executeQuery();
-                while (rs.next()){
-                    return rs.getInt("CockID");
-                }
-
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
+    public static int getInvitorCockID(int inviteID){
+        try (Connection c = dbConnection.getConnection();) {
+            PreparedStatement ps = c.prepareStatement("Select CockID from tblinvite where InviteID = ?");
+            ps.setInt(  1, inviteID);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()){
+                return rs.getInt("CockID");
             }
-            return -1; //returns -1 if error occurs
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
+        return -1; //returns -1 if error occurs
+    }
 
-        public static boolean insertMatch(int invitorCockID, int inviteeCockId){
-            try (Connection c = dbConnection.getConnection();) {
-                PreparedStatement ps = c.prepareStatement("Insert into tblmatch(invitorCockID, inviteeCockID) values (?,?)");
-                ps.setInt(  1, invitorCockID);
-                ps.setInt(  1, inviteeCockId);
-                return ps.execute();
+    public static boolean insertMatch(int invitorCockID, int inviteeCockId){
+        try (Connection c = dbConnection.getConnection();) {
+            PreparedStatement ps = c.prepareStatement("Insert into tblmatch(invitorCockID, inviteeCockID) values (?,?)");
+            ps.setInt(  1, invitorCockID);
+            ps.setInt(  1, inviteeCockId);
+            return ps.execute();
 
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static boolean valueExists(String tablename, String columnname, String value){
+        try (Connection c = dbConnection.getConnection();) {
+            PreparedStatement ps = c.prepareStatement("Select * from ? where ? = ?");
+            ps.setString(1,tablename);
+            ps.setString(2, columnname);
+            ps.setString(3,value);
+            ResultSet rs = ps.executeQuery();
+            int number_of_rows = rs.getRow();
+            return number_of_rows!=0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static int createAccount(String DisplayName,String Username, String Password){
+        try (Connection c = dbConnection.getConnection();) {
+            boolean usernameExists = valueExists("tbluser","Username",Username);
+            if(usernameExists ){
+                System.out.println("Username already exists");
+                return -1;
+            }else{
+                PreparedStatement ps = c.prepareStatement("Insert into tbluser(Displayname,Username,Password) values (?,?,?)");
+                ps.setString(1,DisplayName);
+                ps.setString(2,Username);
+                ps.setString(3,Password);
+                ps.execute();
+                return getUserId(Username);
             }
-        }
 
-        public static boolean valueExists(String tablename, String columnname, String value){
-            try (Connection c = dbConnection.getConnection();) {
-                PreparedStatement ps = c.prepareStatement("Select * from ? where ? = ?");
-                ps.setString(1,tablename);
-                ps.setString(2, columnname);
-                ps.setString(3,value);
-                ResultSet rs = ps.executeQuery();
-                int number_of_rows = rs.getRow();
-                return number_of_rows!=0;
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static int getUserId(String username){
+        try (Connection c = dbConnection.getConnection();) {
+            PreparedStatement ps = c.prepareStatement("Select UserID from tbluser where Username=?");
+            ps.setString(1,username);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                return rs.getInt("UserID");
             }
-        }
 
-        public static int createAccount(String DisplayName,String Username, String Password){
-            try (Connection c = dbConnection.getConnection();) {
-                boolean usernameExists = valueExists("tbluser","Username",Username);
-                if(usernameExists ){
-                    System.out.println("Username already exists");
-                    return -1;
-                }else{
-                    PreparedStatement ps = c.prepareStatement("Insert into tbluser(Displayname,Username,Password) values (?,?,?)");
-                    ps.setString(1,DisplayName);
-                    ps.setString(2,Username);
-                    ps.setString(3,Password);
-                    ps.execute();
-                    return getUserId(Username);
-                }
-
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-
-        public static int getUserId(String username){
-            try (Connection c = dbConnection.getConnection();) {
-                PreparedStatement ps = c.prepareStatement("Select UserID from tbluser where Username=?");
-                ps.setString(1,username);
-                ResultSet rs = ps.executeQuery();
-                while(rs.next()){
-                    return rs.getInt("UserID");
-                }
-
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-            return -1;
+        return -1;
+    }
+    public static boolean sendAttack(Attack atk){
+        boolean res = false;
+        try(Connection c = dbConnection.getConnection();
+         PreparedStatement ps = c.prepareStatement("INSERT INTO tblattack(name,speed,damage,damageMultiplier,attackModule) values (?,?,?,?,?)")){
+            ps.setString(1,atk.getName());
+            ps.setInt(2,atk.getSpeed());
+            ps.setInt(3,atk.getDamage());
+            ps.setDouble(4,atk.getDamageMultiplier());
+            ps.setInt(5,AttackHelper.attackModuleToInt(atk.getAttackModule()));
+            res = ps.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        public static boolean sendAttack(Attack atk){
-            boolean res = false;
-            try(Connection c = dbConnection.getConnection();
-             PreparedStatement ps = c.prepareStatement("INSERT INTO tblattack(name,speed,damage,damageMultiplier,attackModule) values (?,?,?,?,?)")){
-                ps.setString(1,atk.getName());
-                ps.setInt(2,atk.getSpeed());
-                ps.setInt(3,atk.getDamage());
-                ps.setDouble(4,atk.getDamageMultiplier());
-                ps.setInt(5,AttackHelper.attackModuleToInt(atk.getAttackModule()));
-                res = ps.execute();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-            return res;
+        return res;
+    }
+    public boolean toggleIsDisabled(int AttackID, boolean isDisabledState){
+        boolean res = false;
+        try(Connection c = dbConnection.getConnection();
+            PreparedStatement ps = c.prepareStatement("UPDATE tblattack SET isDisabled = ? WHERE attackID = ?")){
+            ps.setBoolean(1,isDisabledState);
+            ps.setInt(2,AttackID);
+            res = ps.execute();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
+        return res;
+    }
 }
