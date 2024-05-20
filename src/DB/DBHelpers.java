@@ -3,10 +3,7 @@ package DB;
 import Attacks.AttackHelper;
 import Attacks.AttackModule;
 import Builders.AttackModuleBuilder;
-import Main.Attack;
-import Main.Cock;
-import Main.Helpers;
-import Main.User;
+import Main.*;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -133,6 +130,7 @@ public class DBHelpers {
                         rs.getInt("UserID")
                 );
                 int[] AttackIDs = {rs.getInt("Attack1ID"),rs.getInt("Attack2ID"),rs.getInt("Attack3ID"),rs.getInt("Attack4ID")};
+                cock.setCockID(rs.getInt("CockID"));
                 HashMap<Integer,Attack> allAttack = AttackHelper.fetchAllAttack();
                 for(int AIDs: AttackIDs){
                     if(AIDs == 0) break;
@@ -231,21 +229,17 @@ public class DBHelpers {
         }
     }
 
-    public ArrayList<Runnable> getAllUnverifiedMatches(){
+    public ArrayList<MatchFacade> getAllUnverifiedMatches(){
         try(Connection C = dbConnection.getConnection();
             PreparedStatement ps = C.prepareStatement("SELECT * FROM tblmatch WHERE winner = 0")){
             ResultSet res = ps.executeQuery();
             HashMap<Integer,Cock> allCocks = getAllCockData();
-            ArrayList<Runnable> Matches = new ArrayList<>();
+            ArrayList<MatchFacade> Matches = new ArrayList<>();
             while(res.next()){
-                Cock cock1;
-                Cock cock2;
-                cock1 = allCocks.get(res.getInt("invitorCockID")).clone();
-                cock2 = allCocks.get(res.getInt("inviteeCockID")).clone();
-                Runnable matchRun = () ->{
-                    Helpers.Fight(cock1,cock2);
-                };
-                Matches.add(matchRun);
+                int invtrID = res.getInt("invitorCockID");
+                int invteID = res.getInt("inviteeCockID");
+                MatchFacade mf = new MatchFacade(res.getInt("matchID"),invtrID,invteID);
+                Matches.add(mf);
             }
             return Matches;
         } catch (SQLException e) {
@@ -286,8 +280,6 @@ public class DBHelpers {
 
 
     public static String getDisplayName(int userid){
-//        returns displayname given userid
-        //returns null if user id doesn't exists
 
         try(Connection C = dbConnection.getConnection();){
             PreparedStatement ps = C.prepareStatement("Select DisplayName from tbluser where UserID = ?");

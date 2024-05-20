@@ -10,8 +10,13 @@ public class Main {
     public static void main(String[] args) {
         DBHelpers.setGlobalConnection(new LocalHostConnection());
         DBHelpers dbh = new DBHelpers(DBHelpers.getGlobalConnection());
-        ArrayList<Runnable> Matches = dbh.getAllUnverifiedMatches();
+        ArrayList<MatchFacade> Matches = dbh.getAllUnverifiedMatches();
         System.out.println("Done Getting Fights");
+        HashMap<Integer,Cock> allcocks = dbh.getAllCockData();
+        for(MatchFacade run : Matches){
+            int winner = run.playMatch(allcocks);
+            dbh.setWinner(run.getMatchID(),winner);
+        }
     }
     public void Test2(){
         DBHelpers dbh = new DBHelpers(new LocalHostConnection());

@@ -10,11 +10,11 @@ public class Helpers {
         while(true) {
             if(player.getStat(Cock.StatName.HEALTH, Cock.StatType.CURRENT) <= 0){
                 System.out.println("Player Died");
-                return -1;
+                return enemy.getCockID();
             }
             if(enemy.getStat(Cock.StatName.HEALTH, Cock.StatType.CURRENT) <= 0){
                 System.out.println("Enemy Died");
-                return 1;
+                return player.getCockID();
             }
             Attack PlayerAttack = player.getAttack();
             Attack EnemyAttack = enemy.getAttack();
