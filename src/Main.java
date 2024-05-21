@@ -1,7 +1,8 @@
-import Attacks.AttackHelper;
-import DB.DBHelpers;
+import DB.AttackHelper;
+import Globals.DBHelpers;
 import DB.LocalHostConnection;
 import Main.*;
+import Threading.MotherThreadController;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,10 +14,8 @@ public class Main {
         ArrayList<MatchFacade> Matches = dbh.getAllUnverifiedMatches();
         System.out.println("Done Getting Fights");
         HashMap<Integer,Cock> allcocks = dbh.getAllCockData();
-        for(MatchFacade run : Matches){
-            int winner = run.playMatch(allcocks);
-            dbh.setWinner(run.getMatchID(),winner);
-        }
+        MotherThreadController MTC = new MotherThreadController(Matches,4);
+        MTC.startMatches();
     }
     public void Test2(){
         DBHelpers dbh = new DBHelpers(new LocalHostConnection());

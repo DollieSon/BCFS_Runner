@@ -1,6 +1,7 @@
-package DB;
+package Globals;
 
-import Attacks.AttackHelper;
+import DB.DBConnection;
+import DB.AttackHelper;
 import Attacks.AttackModule;
 import Builders.AttackModuleBuilder;
 import Main.*;
@@ -8,6 +9,7 @@ import Main.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class DBHelpers {
 
@@ -52,7 +54,7 @@ public class DBHelpers {
         }
         return allAttacks;
     }
-    public static User LoginUser(String Username, String Password) {
+    public User LoginUser(String Username, String Password) {
         try (Connection c = dbConnection.getConnection();
              PreparedStatement ps = c.prepareStatement("SELECT UserID,DisplayName FROM tbluser WHERE Username = ? AND Password = ?")) {
             ps.setString(1, Username);
@@ -68,7 +70,7 @@ public class DBHelpers {
         return User.getCurrUser();
     }
 
-    public static boolean SendCockData(Cock cock) {
+    public boolean SendCockData(Cock cock) {
         ArrayList<Attack> lists = cock.getAttackList();
         boolean result = false;
         try (Connection c = dbConnection.getConnection();
@@ -93,7 +95,7 @@ public class DBHelpers {
         return result;
     }
 
-    public static int getCockID(Cock cock){
+    public int getCockID(Cock cock){
             ArrayList<Attack> lists = cock.getAttackList();
             int res = 0;
             try(Connection C = dbConnection.getConnection();
@@ -118,7 +120,7 @@ public class DBHelpers {
             return res;
     }
 
-    public static HashMap<Integer, Cock> getAllCockData(){
+    public HashMap<Integer, Cock> getAllCockData(){
         HashMap<Integer, Cock> cockData = null;
         try(Connection c = dbConnection.getConnection();
             PreparedStatement ps = c.prepareStatement("SELECT * FROM tblcock")){
@@ -147,7 +149,7 @@ public class DBHelpers {
     }
 
     //TODO: Update, Using The Outdated tbl
-    public static boolean challengePlayer(int invitorCockID,int inviteeID, int invitorID){
+    public boolean challengePlayer(int invitorCockID,int inviteeID, int invitorID){
         boolean isSuccess = false;
         try(Connection C = dbConnection.getConnection();){
             PreparedStatement ps = C.prepareStatement("Insert into tblinvite(invitorCockID,inviteeID,invitorID) values(?,?,?)");
@@ -161,7 +163,7 @@ public class DBHelpers {
     }
 
 
-    public static boolean acceptInvite(int inviteID, int inviteeCockID){
+    public boolean acceptInvite(int inviteID, int inviteeCockID){
         try(Connection C = dbConnection.getConnection();){
             PreparedStatement ps = C.prepareStatement("UPDATE tblinvite set isAccepted = 1 where InviteID = ?");
             ps.setInt(1,inviteID);
@@ -190,7 +192,7 @@ public class DBHelpers {
         }
         return false;
     }
-    public static boolean createMatch(int invitorCockID, int inviteeCockID){
+    public boolean createMatch(int invitorCockID, int inviteeCockID){
 
         try(Connection C = dbConnection.getConnection();){
             PreparedStatement ps = C.prepareStatement("Insert into tblmatch(invitorCockID,inviteeCockID) values (?,?)");
@@ -217,6 +219,34 @@ public class DBHelpers {
             throw new RuntimeException(e);
         }
         return res;
+    }
+    public boolean batchSetWinner(HashMap<Integer,Integer> reses){
+        Boolean res;
+        try(Connection C = dbConnection.getConnection();){
+            StringBuilder switchCase = new StringBuilder();
+            for(int matchID : reses.keySet()){
+                String CaseStament = String.format(" WHEN matchID = %d THEN %d",matchID,reses.get(matchID));
+                switchCase.append(CaseStament);
+            }
+            switchCase.append(" ELSE winner");
+            Iterator<Integer> it= reses.keySet().iterator();
+            Integer prevs = null;
+            StringBuilder InsideSet = new StringBuilder();
+            while(it.hasNext()){
+                Integer currs = it.next();
+                prevs = currs;
+                InsideSet.append(prevs);
+                if(it.hasNext()){
+                    InsideSet.append(",");
+                }
+            }
+            Statement st = C.createStatement();
+            String query = String.format("UPDATE tblmatch SET winner = CASE %s END WHERE matchID IN (%s)",switchCase,InsideSet);
+            System.out.println(query);
+            return st.execute(query);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private boolean DeletePreviousMatch(int matchID){
@@ -247,7 +277,7 @@ public class DBHelpers {
         }
     }
 
-    public static ArrayList<Integer> getChallenges(int userID){
+    public ArrayList<Integer> getChallenges(int userID){
         ArrayList<Integer> inviteIds = new ArrayList<>();
 
         try(Connection C = dbConnection.getConnection();
@@ -264,7 +294,7 @@ public class DBHelpers {
         }
     }
 
-    public static boolean updateDetails(int userID, String displayName, String username, String Password){
+    public boolean updateDetails(int userID, String displayName, String username, String Password){
         try(Connection C = dbConnection.getConnection();
             PreparedStatement ps = C.prepareStatement("UPDATE tbluser Set DisplayName = ?, Username = ?, Password = ? where UserID = ?")){
             ps.setString(1,displayName);
@@ -279,7 +309,7 @@ public class DBHelpers {
     }
 
 
-    public static String getDisplayName(int userid){
+    public String getDisplayName(int userid){
 
         try(Connection C = dbConnection.getConnection();){
             PreparedStatement ps = C.prepareStatement("Select DisplayName from tbluser where UserID = ?");
@@ -296,7 +326,7 @@ public class DBHelpers {
 
         return null;
     }
-    public static int getInvitorCockID(int inviteID){
+    public int getInvitorCockID(int inviteID){
         try (Connection c = dbConnection.getConnection();) {
             PreparedStatement ps = c.prepareStatement("Select CockID from tblinvite where InviteID = ?");
             ps.setInt(  1, inviteID);
@@ -311,7 +341,7 @@ public class DBHelpers {
         return -1; //returns -1 if error occurs
     }
 
-    public static boolean insertMatch(int invitorCockID, int inviteeCockId){
+    public boolean insertMatch(int invitorCockID, int inviteeCockId){
         try (Connection c = dbConnection.getConnection();) {
             PreparedStatement ps = c.prepareStatement("Insert into tblmatch(invitorCockID, inviteeCockID) values (?,?)");
             ps.setInt(  1, invitorCockID);
@@ -323,7 +353,7 @@ public class DBHelpers {
         }
     }
 
-    public static boolean valueExists(String tablename, String columnname, String value){
+    public boolean valueExists(String tablename, String columnname, String value){
         try (Connection c = dbConnection.getConnection();) {
             PreparedStatement ps = c.prepareStatement("Select * from ? where ? = ?");
             ps.setString(1,tablename);
@@ -337,7 +367,7 @@ public class DBHelpers {
         }
     }
 
-    public static int createAccount(String DisplayName,String Username, String Password){
+    public int createAccount(String DisplayName,String Username, String Password){
         try (Connection c = dbConnection.getConnection();) {
             boolean usernameExists = valueExists("tbluser","Username",Username);
             if(usernameExists ){
@@ -357,7 +387,7 @@ public class DBHelpers {
         }
     }
 
-    public static int getUserId(String username){
+    public int getUserId(String username){
         try (Connection c = dbConnection.getConnection();) {
             PreparedStatement ps = c.prepareStatement("Select UserID from tbluser where Username=?");
             ps.setString(1,username);
@@ -371,7 +401,7 @@ public class DBHelpers {
         }
         return -1;
     }
-    public static boolean sendAttack(Attack atk){
+    public boolean sendAttack(Attack atk){
         boolean res = false;
         try(Connection c = dbConnection.getConnection();
          PreparedStatement ps = c.prepareStatement("INSERT INTO tblattack(name,speed,damage,damageMultiplier,attackModule) values (?,?,?,?,?)")){

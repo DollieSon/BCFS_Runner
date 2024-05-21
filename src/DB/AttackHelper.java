@@ -1,9 +1,12 @@
-package Attacks;
+package DB;
 
-import DB.DBHelpers;
+import Attacks.AttackModule;
+import Attacks.Heal;
+import Attacks.Leech;
+import Attacks.SingleAttack;
+import Globals.DBHelpers;
 import Main.Attack;
 
-import java.sql.Connection;
 import java.util.HashMap;
 
 public class AttackHelper {

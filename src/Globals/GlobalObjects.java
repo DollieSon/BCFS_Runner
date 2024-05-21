@@ -1,4 +1,6 @@
-package Main;
+package Globals;
+
+import Main.Attack;
 
 import java.util.HashMap;
 
