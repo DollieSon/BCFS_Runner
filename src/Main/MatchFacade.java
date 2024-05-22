@@ -18,6 +18,7 @@ public class MatchFacade {
         Cock cock1 = allCocks.get(invitorCockID).clone();
         Cock cock2 = allCocks.get(inviteeCockID).clone();
         return Helpers.Fight(cock1,cock2);
+
     }
     public int getMatchID() {
         return matchID;

@@ -31,12 +31,15 @@ public class MatchThread implements Runnable{
     public int getqSize(){
         return qSize;
     }
+    public boolean isempty(){
+        return matchQueue.isEmpty();
+    }
     @Override
     public void run() {
         currentItem = 0;
         for(MatchFacade mf: matchQueue){
             int winner = mf.playMatch(CockMap);
-            System.out.println(mf.getMatchID() + "," + winner);
+            //System.out.println(mf.getMatchID() + "," + winner);
             TaskCheck.put(mf.getMatchID(),winner);
             currentItem++;
             /*try {

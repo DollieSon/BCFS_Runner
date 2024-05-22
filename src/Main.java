@@ -1,23 +1,54 @@
 import DB.AttackHelper;
 import Globals.DBHelpers;
 import DB.LocalHostConnection;
+import Globals.Helpers;
 import Main.*;
 import Threading.MotherThreadController;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
+import java.util.Set;
 
 public class Main {
     public static void main(String[] args) {
+//        verifyAllMatchTest();
+
+    }
+
+    public static void verifyAllMatchTest(){
         DBHelpers.setGlobalConnection(new LocalHostConnection());
         DBHelpers dbh = new DBHelpers(DBHelpers.getGlobalConnection());
+
+//        try(Connection C = DBHelpers.getGlobalConnection().getConnection()){
+//            Statement st = C.createStatement();
+//            st.execute("UPDATE tblmatch SET winner = 0 WHERE 1");
+//            Thread.sleep(1000);
+//        } catch (SQLException | InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+
         ArrayList<MatchFacade> Matches = dbh.getAllUnverifiedMatches();
         System.out.println("Done Getting Fights");
         HashMap<Integer,Cock> allcocks = dbh.getAllCockData();
-        MotherThreadController MTC = new MotherThreadController(Matches,4);
-        MTC.startMatches();
+        MotherThreadController MTC = new MotherThreadController(Matches,5);
+        Thread MotherThread = new Thread(MTC);
+        MotherThread.start();
+        while(MotherThread.isAlive()){
+            System.out.println("Mother is Looping");
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
-    public void Test2(){
+
+    public static void Test2(){
         DBHelpers dbh = new DBHelpers(new LocalHostConnection());
         //dbh.CreateAccount("PcRestarting","PcResting","12345"); // Create Account
     }

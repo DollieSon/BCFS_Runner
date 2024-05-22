@@ -7,7 +7,7 @@ import Main.MatchFacade;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class MotherThreadController {
+public class MotherThreadController implements Runnable{
     private int num_threads;
     private ArrayList<MatchThread> ChildThreads;
     private HashMap<Integer,Integer> ThreadResults;
@@ -27,13 +27,18 @@ public class MotherThreadController {
             ChildThreads.get(x%threads).addTask(mf);
         }
     }
-    public void startMatches(){
+    private void startMatches(){
         ArrayList<Thread> runs = new ArrayList<>();
+        boolean isempty = true;
         for(MatchThread mt: ChildThreads){
             Thread child = new Thread(mt);
             runs.add(child);
             child.start();
         }
+        for(MatchThread mt:ChildThreads){
+            if(!mt.isempty()) isempty = false;
+        }
+        if(isempty) return;
         boolean isFinished = false;
         do{
             isFinished = true;
@@ -56,5 +61,10 @@ public class MotherThreadController {
         //Batch Send Result
         DBHelpers dbh = new DBHelpers(DBHelpers.getGlobalConnection());
         dbh.batchSetWinner(ThreadResults);
+    }
+
+    @Override
+    public void run() {
+        startMatches();
     }
 }
