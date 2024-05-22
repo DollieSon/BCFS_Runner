@@ -429,4 +429,18 @@ public class DBHelpers {
         }
         return res;
     }
+    public HashMap<Integer,String> getAllDIsplayNames(){
+        HashMap<Integer,String> Unames = new HashMap<>();
+        try(Connection C = dbConnection.getConnection();){
+            Statement st = C.createStatement();
+            String querry = "SELECT UserID,DisplayName FROM tbluser";
+            ResultSet rs =  st.executeQuery(querry);
+            while (rs.next()){
+                Unames.put(rs.getInt("UserID"), rs.getString("DisplayName"));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return Unames;
+    }
 }
