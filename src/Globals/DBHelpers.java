@@ -13,6 +13,27 @@ import java.util.Iterator;
 
 public class DBHelpers {
 
+//    global static variables
+    public static HashMap<Integer, Attack> allAtcks = null;
+    public static User currentUser = null;
+    public static Boolean cockData = null;
+    public static Integer cockID = null;
+    public static HashMap<Integer, Attack> allCockData = null;
+    public static Boolean isPlayerChallenged = null;
+    public static Boolean isInviteAccepted = null;
+    public static Boolean isMatchCreated = null;
+    public static Boolean isWinnerSet = null;
+    public static Boolean isBatchWinnerSet = null;
+    public static Boolean isPreviousMatchDeleted = null;
+    public static ArrayList<MatchFacade> allUnverifiedMatches = null;
+    public static ArrayList<Integer> allChallenges = null;
+    public static Boolean isDetailsUpdated = null;
+
+
+
+
+
+
     /**is an interface to allow modularity in connections**/
     private static DBConnection dbConnection;
     /**to allow a unified connection when constructing DBHelpers <br> DBHelpers dbh = new DBHelpers(DBHelpers.getGlobalConnection()) <br> So that we can easily change from supabase to localhost for testing<**/
@@ -52,6 +73,7 @@ public class DBHelpers {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        allAtcks = allAttacks;
         return allAttacks;
     }
     public User LoginUser(String Username, String Password) {
@@ -67,6 +89,7 @@ public class DBHelpers {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        currentUser = User.getCurrUser();
         return User.getCurrUser();
     }
 
@@ -92,6 +115,7 @@ public class DBHelpers {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        cockData = result;
         return result;
     }
 
@@ -117,6 +141,7 @@ public class DBHelpers {
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
+            cockID = res;
             return res;
     }
 
@@ -145,18 +170,19 @@ public class DBHelpers {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        allCockData = cockData;
         return cockData;
     }
-
-    //TODO: Update, Using The Outdated tbl
     public boolean challengePlayer(int invitorCockID,int inviteeID, int invitorID){
         boolean isSuccess = false;
+
         try(Connection C = dbConnection.getConnection();){
             PreparedStatement ps = C.prepareStatement("Insert into tblinvite(invitorCockID,inviteeID,invitorID) values(?,?,?)");
             ps.setInt(1,invitorCockID);
             ps.setInt(2,inviteeID);
             ps.setInt(3,invitorID);
-            return ps.execute();
+            isPlayerChallenged = ps.execute();
+            return isPlayerChallenged;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -164,10 +190,12 @@ public class DBHelpers {
 
 
     public boolean acceptInvite(int inviteID, int inviteeCockID){
+        Boolean result = null;
         try(Connection C = dbConnection.getConnection();){
             PreparedStatement ps = C.prepareStatement("UPDATE tblinvite set isAccepted = 1 where InviteID = ?");
             ps.setInt(1,inviteID);
             boolean isSuccess =  ps.execute();
+
             if(isSuccess){
                 //createMatch
                 PreparedStatement ps1 = C.prepareStatement("Select invitorCockID from tblinvite where InviteID = ?");
@@ -181,16 +209,18 @@ public class DBHelpers {
 
                 if(invitorCockID==-1){
                     System.out.println("An Error occured while getting the invitorCockID");
-                    return false;
+                    result = false;
                 }else{
                     createMatch(invitorCockID,inviteeCockID);
-                    return true;
+                    result = true;
                 }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return false;
+        result = false;
+        isInviteAccepted = result;
+        return result;
     }
     public boolean createMatch(int invitorCockID, int inviteeCockID){
 
@@ -198,14 +228,15 @@ public class DBHelpers {
             PreparedStatement ps = C.prepareStatement("Insert into tblmatch(invitorCockID,inviteeCockID) values (?,?)");
             ps.setInt(1,invitorCockID);
             ps.setInt(2,inviteeCockID);
-            return  ps.execute();
+            isMatchCreated = ps.execute();
+            return  isMatchCreated;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     public boolean setWinner(int matchID, int WinnerID){
-        Boolean res;
+        Boolean res = false;
         try(Connection C = dbConnection.getConnection();
             PreparedStatement ps = C.prepareStatement("UPDATE tblmatch SET winner = ? WHERE matchID = ?")){
             ps.setInt(1,WinnerID);
@@ -213,6 +244,7 @@ public class DBHelpers {
             res = ps.execute();
             if(res){
                 res = res && DeletePreviousMatch(matchID);
+                isWinnerSet = res;
                 return res;
             }
         } catch (SQLException e) {
@@ -243,7 +275,8 @@ public class DBHelpers {
             Statement st = C.createStatement();
             String query = String.format("UPDATE tblmatch SET winner = CASE %s END WHERE matchID IN (%s)",switchCase,InsideSet);
             System.out.println(query);
-            return st.execute(query);
+            isBatchWinnerSet = st.execute(query);
+            return isBatchWinnerSet;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -253,7 +286,8 @@ public class DBHelpers {
         try(Connection C = dbConnection.getConnection();
         PreparedStatement ps = C.prepareStatement("DELETE FROM tblmatch WHERE matchID = ?")){
             ps.setInt(1,matchID);
-            return ps.execute();
+            isPreviousMatchDeleted = ps.execute();
+            return isPreviousMatchDeleted;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -271,6 +305,7 @@ public class DBHelpers {
                 MatchFacade mf = new MatchFacade(res.getInt("matchID"),invtrID,invteID);
                 Matches.add(mf);
             }
+            allUnverifiedMatches = Matches;
             return Matches;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -288,6 +323,7 @@ public class DBHelpers {
             while(rs.next()){
                 inviteIds.add(rs.getInt("InviteID"));
             }
+            allChallenges = inviteIds;
             return inviteIds;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -301,13 +337,13 @@ public class DBHelpers {
             ps.setString(2,username);
             ps.setString(3,Password);
             ps.setInt(4,userID);
-            return ps.execute();
+            isDetailsUpdated = ps.execute();
+            return isDetailsUpdated;
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
-
 
     public String getDisplayName(int userid){
 
@@ -326,6 +362,7 @@ public class DBHelpers {
 
         return null;
     }
+
     public int getInvitorCockID(int inviteID){
         try (Connection c = dbConnection.getConnection();) {
             PreparedStatement ps = c.prepareStatement("Select CockID from tblinvite where InviteID = ?");
