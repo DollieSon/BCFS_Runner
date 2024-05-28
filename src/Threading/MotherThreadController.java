@@ -1,5 +1,7 @@
 package Threading;
 
+
+
 import Globals.DBHelpers;
 import Main.Cock;
 import Main.MatchFacade;
@@ -11,22 +13,45 @@ public class MotherThreadController implements Runnable{
     private int num_threads;
     private ArrayList<MatchThread> ChildThreads;
     private HashMap<Integer,Integer> ThreadResults;
+    private boolean isFinished;
 
     public MotherThreadController(ArrayList<MatchFacade> mfs, int threads){
+        isFinished = false;
         num_threads = threads;
-        DBHelpers dbh = new DBHelpers(DBHelpers.getGlobalConnection());
         ChildThreads = new ArrayList<>();
         ThreadResults = new HashMap<>();
+        DBHelpers dbh = new DBHelpers(DBHelpers.getGlobalConnection());
         HashMap<Integer, Cock> allcock = dbh.getAllCockData();
-        for(int x=0;x<threads;x++){
+        prepareThreads(allcock,mfs);
+    }
+
+    public MotherThreadController(ArrayList<MatchFacade> mfs, int threads, HashMap<Integer,Cock> customC){
+        isFinished = false;
+        num_threads = threads;
+        ChildThreads = new ArrayList<>();
+        ThreadResults = new HashMap<>();
+        prepareThreads(customC,mfs);
+
+    }
+    private void prepareThreads(HashMap<Integer,Cock> allcock,ArrayList<MatchFacade> mfs){
+        for(int x=0;x<num_threads;x++){
             ChildThreads.add(new MatchThread(ThreadResults,allcock));
         }
         for(int x=0;x<mfs.size();x++){
             MatchFacade mf = mfs.get(x);
             System.out.println("Inserting Match: " + mf.getMatchID() );
-            ChildThreads.get(x%threads).addTask(mf);
+            ChildThreads.get(x%num_threads).addTask(mf);
         }
     }
+
+    public HashMap<Integer, Integer> getThreadResults() {
+        return ThreadResults;
+    }
+
+    public boolean isFinished() {
+        return isFinished;
+    }
+
     private void startMatches(){
         ArrayList<Thread> runs = new ArrayList<>();
         boolean isempty = true;
@@ -39,7 +64,6 @@ public class MotherThreadController implements Runnable{
             if(!mt.isempty()) isempty = false;
         }
         if(isempty) return;
-        boolean isFinished = false;
         do{
             isFinished = true;
             for(Thread run : runs){
@@ -60,7 +84,6 @@ public class MotherThreadController implements Runnable{
         }while (!isFinished);
         //Batch Send Result
         DBHelpers dbh = new DBHelpers(DBHelpers.getGlobalConnection());
-        dbh.batchSetWinner(ThreadResults);
     }
 
     @Override
