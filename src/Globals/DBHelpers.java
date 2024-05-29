@@ -7,9 +7,7 @@ import Builders.AttackModuleBuilder;
 import Main.*;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 public class DBHelpers {
 
@@ -140,6 +138,35 @@ public class DBHelpers {
         }
         return cockData;
     }
+
+//    public
+//    int userID
+    public Map<Integer , List<Integer>> getUserMatches(int userId){
+        try (Connection c = dbConnection.getConnection()){
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM tblmatch " +
+                    "WHERE (tblmatch.invitorCockID = tblcock.CockID OR tblmatch.inviteeCockID = tblcock.CockID) " +
+                    "AND tblcock.UserID = ?");
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            Map<Integer , List<Integer>> map = new HashMap<>();
+            while(rs.next()){
+                int match_id = rs.getInt("matchID");
+                List<Integer> cockIDs = new ArrayList<>();
+                cockIDs.add(rs.getInt("invitorCockID"));
+
+                cockIDs.add(rs.getInt("inviteeCockID"));
+
+                cockIDs.add(rs.getInt("winner"));
+                map.put(match_id,cockIDs);
+            }
+            return map;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 
     public int getCockID(Cock cock){
         if(!hasReachedTransactionLimit()){
